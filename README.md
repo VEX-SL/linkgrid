@@ -171,6 +171,7 @@ If you prefer an interactive editor, follow the instructions in the [Advanced Cu
 
 ```
 linkgrid/
+├── favicon.png         # Site Icon
 ├── index.html          # Main HTML file
 ├── style.css           # All styles (dark theme, animations)
 ├── script.js           # JavaScript logic (fetch, render, toast)
