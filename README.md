@@ -42,19 +42,14 @@ A modern, lightning-fast, and fully customizable **link-in-bio** solution built 
 ## 🚀 **Live Demo**
 
 👉 [View Live Demo](https://vexlinks.vercel.app)  
-*(Replace with your actual demo URL)*
 
 ---
 
 ## 📸 **Screenshots**
 
-> **Replace these placeholders with your own screenshots!**
-
 | Desktop | Mobile |
 |---------|--------|
-| ![Desktop](https://via.placeholder.com/600x400?text=Desktop+Screenshot) | ![Mobile](https://via.placeholder.com/300x600?text=Mobile+Screenshot) |
-
-*Add your screenshots to the `/screenshots` folder and update the paths above.*
+| ![Desktop](./screenshots/desktop.png) | ![Mobile](./screenshots/mobile.png) |
 
 ---
 
