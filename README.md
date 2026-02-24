@@ -41,15 +41,22 @@ A modern, lightning-fast, and fully customizable **link-in-bio** solution built 
 
 ## 🚀 **Live Demo**
 
-👉 [View Live Demo](https://vexlinks.vercel.app)  
+👉 [View Live Demo](https://vexlinks.vercel.app)
 
 ---
 
 ## 📸 **Screenshots**
 
-| Desktop | Mobile |
-|---------|--------|
-| ![Desktop](./screenshots/desktop.png) | ![Mobile](./screenshots/mobile.png) |
+Below are previews of LinkGrid in action. All screenshots are stored in the `/screenshots` folder.  
+*To add your own, simply place images (PNG, JPG, etc.) in that folder and they will be displayed here automatically if you use a dynamic gallery – otherwise, update this section manually.*
+
+<div align="center">
+  <img src="./screenshots/desktop.png" alt="Desktop view" width="45%" style="margin:5px"/>
+  <img src="./screenshots/mobile.png" alt="Mobile view" width="45%" style="margin:5px"/>
+  <!-- Add more images as needed -->
+</div>
+
+> 💡 **Tip:** You can create a simple gallery by adding more `<img>` tags or using a script to auto‑include all images from the folder. For now, this is a manual showcase.
 
 ---
 
@@ -58,7 +65,7 @@ A modern, lightning-fast, and fully customizable **link-in-bio** solution built 
 - **HTML5** – Semantic structure.
 - **CSS3** – Custom properties, Flexbox, Grid, animations, media queries.
 - **JavaScript (ES6+)** – Modules, Fetch API, Promises, DOM manipulation.
-- **Font Awesome 6** – Icon library.
+- **Font Awesome 6** – Icon library (latest v6.7.2).
 - **Google Fonts (Inter)** – Clean, modern typography.
 
 ---
@@ -66,32 +73,39 @@ A modern, lightning-fast, and fully customizable **link-in-bio** solution built 
 ## 📦 **Getting Started**
 
 ### **Prerequisites**
+
 - A modern web browser.
 - A local development server (e.g., [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) for VS Code) – required because `fetch` works over `http://`, not `file://`.
 
 ### **Installation**
 
 1. **Clone the repository**
-   ```bash
-   git clone https://github.com/VEX-SL/linkgrid.git
-   cd linkgrid
-   ```
+
+```bash
+git clone https://github.com/VEX-SL/linkgrid.git
+cd linkgrid
+```
 
 2. **Open with a local server**
-   - If you use VS Code, right‑click `index.html` and select **Open with Live Server**.
-   - Or run a simple Python server:
-     ```bash
-     python3 -m http.server 8000
-     ```
-     Then visit `http://localhost:8000`.
+
+If you use VS Code, right‑click `index.html` and select **Open with Live Server**.
+
+Or run a simple Python server:
+
+```bash
+python3 -m http.server 8000
+```
+
+Then visit `http://localhost:8000`.
 
 3. **Start customizing!** (See below)
 
 ---
 
-## 🎨 **Customization Guide**
+## 🎨 Customization Guide
 
-### **1. Personal Information (Name & Bio)**
+### 1. Personal Information (Name & Bio)
+
 Edit the `index.html` file:
 
 ```html
@@ -101,7 +115,8 @@ Edit the `index.html` file:
 </header>
 ```
 
-### **2. Links & Icons**
+### 2. Links & Icons
+
 All links are stored in `links.json`. Open it and modify the array:
 
 ```json
@@ -119,23 +134,14 @@ All links are stored in `links.json`. Open it and modify the array:
 ]
 ```
 
-- **`name`** – Display name of the platform.
-- **`url`** – Full URL (including `https://`). For email, use `mailto:you@example.com`.
-- **`icon`** – Font Awesome 6 icon class. Find more at [Font Awesome Icons](https://fontawesome.com/icons).
+- `name` – Display name of the platform.
+- `url` – Full URL (including `https://`). For email, use `mailto:you@example.com`.
+- `icon` – Font Awesome 6 icon class. Find the complete list of available icons at [Font Awesome Icons](https://fontawesome.com/icons).
 
-**Common icon classes:**
+> **Note:** Icons like `fa-brands fa-x-twitter` (X/Twitter) and `fa-brands fa-signal-messenger` (Signal) are fully supported in Font Awesome 6.7.2+.
 
-| Platform | Icon Class |
-|----------|------------|
-| GitHub | `fa-brands fa-github` |
-| LinkedIn | `fa-brands fa-linkedin` |
-| Twitter / X | `fa-brands fa-twitter` / `fa-brands fa-x-twitter` |
-| Instagram | `fa-brands fa-instagram` |
-| YouTube | `fa-brands fa-youtube` |
-| Email | `fa-solid fa-envelope` |
-| Personal Website | `fa-solid fa-globe` |
+### 3. Colors & Theme
 
-### **3. Colors & Theme**
 The color scheme is controlled by CSS variables in `style.css` (inside `:root`). Tweak them to match your brand:
 
 ```css
@@ -152,19 +158,21 @@ The color scheme is controlled by CSS variables in `style.css` (inside `:root`).
 }
 ```
 
-### **4. Animations & Effects**
+### 4. Animations & Effects
+
 - **Animation speeds** – Adjust `transition` and `animation` durations in the CSS.
 - **Hover effects** – Modify the `.link-card:hover` rules.
 - **Toast notifications** – Change the `showToast` function in `script.js` to alter message duration or styling.
 
-### **5. Add / Remove Links Dynamically (Optional)**
-If you prefer an interactive editor, follow the instructions in the [Advanced Customization](#advanced-customization) section below.
+### 5. Add / Remove Links Dynamically (Optional)
+
+If you prefer an interactive editor, follow the instructions in the **Advanced Customization** section below.
 
 ---
 
-## 📁 **Project Structure**
+## 📁 Project Structure
 
-```
+```text
 linkgrid/
 ├── favicon.png         # Site Icon
 ├── index.html          # Main HTML file
@@ -177,30 +185,38 @@ linkgrid/
 
 ---
 
-## 🔧 **Advanced Customization**
+## 🔧 Advanced Customization
 
-### **Using Local Storage as a Mini‑CMS**
-If you want to add/edit links directly from the browser, you can enable the built‑in **admin panel**:
+### Using Local Storage as a Mini‑CMS
+
+If you want to add/edit links directly from the browser, you can enable the built‑in admin panel:
 
 1. Uncomment the HTML for the "Add Link" button and modal in `index.html`.
-2. Add the corresponding CSS from the Advanced section in `style.css`.
-3. Include the JavaScript from the Advanced section in `script.js`.
+2. Uncomment the corresponding CSS in `style.css` (the `.add-btn`, `.modal`, `.delete-btn` sections).
+3. Uncomment the JavaScript code at the bottom of `script.js` (the admin panel section).
 
 This will allow you to:
+
 - Click a button to open a modal.
 - Enter a new link (name, URL, icon) and save it.
 - Links are saved to `localStorage` and persist across sessions.
 - Delete links by clicking the "×" that appears on hover.
 
-### **Hosting on GitHub Pages**
+> ⚠️ **Important Security Note:**  
+> The admin panel uses `localStorage` and is disabled by default. If you enable it, any visitor to your site will be able to add, edit, or delete links because the code runs entirely on the client side. This is fine for personal use or local testing, but **do not enable it on a public website** unless you implement proper authentication.
+>
+> The recommended and safest way to manage your links is to edit the `links.json` file directly and redeploy your site. That way, you retain full control and no one else can modify your links.
+
+### Hosting on GitHub Pages
+
 1. Push the project to a GitHub repository.
-2. Go to **Settings** → **Pages**.
+2. Go to **Settings → Pages**.
 3. Select the `main` branch and `/root` folder.
 4. Your site will be live at `https://yourusername.github.io/linkgrid/`.
 
 ---
 
-## 🤝 **Contributing**
+## 🤝 Contributing
 
 Contributions, issues, and feature requests are welcome!  
 Feel free to check the [issues page](https://github.com/VEX-SL/linkgrid/issues).
@@ -213,15 +229,15 @@ Feel free to check the [issues page](https://github.com/VEX-SL/linkgrid/issues).
 
 ---
 
-## 📄 **License**
+## 📄 License
 
 Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
 
-## 📬 **Contact**
+## 📬 Contact
 
-Your Name – [@your_twitter](https://twitter.com/your_twitter) – email@example.com
+VEX – [@VEX_SL](https://twitter.com/VEX_SL) – vex@example.com
 
 Project Link: [https://github.com/VEX-SL/linkgrid](https://github.com/VEX-SL/linkgrid)
 
