@@ -45,18 +45,11 @@ A modern, lightning-fast, and fully customizable **link-in-bio** solution built 
 
 ---
 
-## 📸 **Screenshots**
-
-Below are previews of LinkGrid in action. All screenshots are stored in the `/screenshots` folder.  
-*To add your own, simply place images (PNG, JPG, etc.) in that folder and they will be displayed here automatically if you use a dynamic gallery – otherwise, update this section manually.*
+## 📸 **Screenshot**
 
 <div align="center">
-  <img src="./screenshots/desktop.png" alt="Desktop view" width="45%" style="margin:5px"/>
-  <img src="./screenshots/mobile.png" alt="Mobile view" width="45%" style="margin:5px"/>
-  <!-- Add more images as needed -->
+  <img src="./screenshots/1.png" alt="Full view" width="45%" style="margin:5px"/>
 </div>
-
-> 💡 **Tip:** You can create a simple gallery by adding more `<img>` tags or using a script to auto‑include all images from the folder. For now, this is a manual showcase.
 
 ---
 
