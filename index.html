@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Links</title>
+    <!-- ================= CUSTOMIZATION FEATURES ================= -->
+    <!-- 1. Change the site title above to your preferred name.     -->
+    <!-- 2. Update the 'name' and 'bio' in the header section below. -->
+    <!-- 3. Replace the favicon link with your own icon (favicon.png). -->
+    <!-- 4. All links are managed externally in 'links.json'.        -->
+    <!-- 5. Colors, animations, and layout can be tweaked in style.css -->
+    <!-- =========================================================== -->
+
+    <!-- ========== ADVANCED INTERACTIVE CUSTOMIZATION ========== -->
+    <!-- Uncomment the button and modal below to enable an in‑page -->
+    <!-- admin panel that lets you add new links directly from the   -->
+    <!-- browser (links are saved to localStorage). Also requires    -->
+    <!-- uncommenting the corresponding CSS (in style.css) and       -->
+    <!-- JavaScript (in script.js).                                  -->
+    <!-- =========================================================== -->
+
+    <!-- Font Awesome 6.7.2 - Latest stable version with X and Signal icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="icon" href="favicon.png" type="image/png">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <!-- Replace with your name and bio -->
+            <h1 class="name">Your Name</h1>
+            <p class="bio">Your Bio</p>
+        </header>
+        <main>
+            <!-- Links will be dynamically injected here by script.js -->
+            <div class="links-grid" id="links-container"></div>
+
+            <!-- ===================================================== -->
+            <!--  ADVANCED: Add Link Button (commented by default)   -->
+            <!-- ===================================================== -->
+            <!--
+            <div style="text-align: center; margin-top: 2rem;">
+                <button id="add-link-btn" class="add-btn">
+                    <i class="fa-solid fa-plus"></i> Add New Link
+                </button>
+            </div>
+            -->
+        </main>
+        <footer>
+            <!-- Update the footer text as needed -->
+            <p>All rights reserved VEX© 2026</p>
+        </footer>
+    </div>
+
+    <!-- ===================================================== -->
+    <!--  ADVANCED: Modal for adding/editing links (commented) -->
+    <!-- ===================================================== -->
+    <!--
+    <div id="link-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Add / Edit Link</h2>
+            <form id="link-form">
+                <div class="form-group">
+                    <label for="link-name">Platform name:</label>
+                    <input type="text" id="link-name" required placeholder="e.g. GitHub">
+                </div>
+                <div class="form-group">
+                    <label for="link-url">URL:</label>
+                    <input type="url" id="link-url" required placeholder="https://...">
+                </div>
+                <div class="form-group">
+                    <label for="link-icon">Icon class:</label>
+                    <input type="text" id="link-icon" required placeholder="fa-brands fa-github">
+                    <small>From <a href="https://fontawesome.com/icons" target="_blank">Font Awesome</a></small>
+                </div>
+                <button type="submit" class="submit-btn">Save</button>
+            </form>
+        </div>
+    </div>
+    -->
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>

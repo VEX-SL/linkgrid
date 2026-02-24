@@ -1,0 +1,37 @@
+[
+    {
+        "name": "GitHub",
+        "url": "https://github.com/yourusername",
+        "icon": "fa-brands fa-github"
+    },
+    {
+        "name": "GitLab",
+        "url": "https://gitlab.com/yourusername",
+        "icon": "fa-brands fa-gitlab"
+    },
+    {
+        "name": "Bitbucket",
+        "url": "https://bitbucket.org/yourusername",
+        "icon": "fa-brands fa-bitbucket"
+    },
+    {
+        "name": "LinkedIn",
+        "url": "https://linkedin.com/in/yourusername",
+        "icon": "fa-brands fa-linkedin"
+    },
+    {
+        "name": "X (Twitter)",
+        "url": "https://x.com/yourusername",
+        "icon": "fa-brands fa-x-twitter"
+    },
+    {
+        "name": "Instagram",
+        "url": "https://instagram.com/yourusername",
+        "icon": "fa-brands fa-instagram"
+    },
+    {
+        "name": "Facebook",
+        "url": "https://facebook.com/yourusername",
+        "icon": "fa-brands fa-facebook"
+    }
+]
