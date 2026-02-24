@@ -1,64 +1,72 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Links</title>
-    <!-- ================= CUSTOMIZATION FEATURES ================= -->
-    <!-- 1. Change the site title above to your preferred name.     -->
-    <!-- 2. Update the 'name' and 'bio' in the header section below. -->
-    <!-- 3. Replace the favicon link with your own icon (favicon.png). -->
-    <!-- 4. All links are managed externally in 'links.json'.        -->
-    <!-- 5. Colors, animations, and layout can be tweaked in style.css -->
-    <!-- =========================================================== -->
-
-    <!-- ========== ADVANCED INTERACTIVE CUSTOMIZATION ========== -->
-    <!-- Uncomment the button and modal below to enable an in‑page -->
-    <!-- admin panel that lets you add new links directly from the   -->
-    <!-- browser (links are saved to localStorage). Also requires    -->
-    <!-- uncommenting the corresponding CSS (in style.css) and       -->
-    <!-- JavaScript (in script.js).                                  -->
-    <!-- =========================================================== -->
-
-    <!-- Font Awesome 6.7.2 - Latest stable version with X and Signal icons -->
+    <!-- Font Awesome 6 (latest) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Custom styles -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Favicon (replace with your own) -->
     <link rel="icon" href="favicon.png" type="image/png">
 </head>
+
 <body>
-    <div class="container">
-        <header>
-            <!-- Replace with your name and bio -->
+    <header>
+    <!--
+        =============================================
+        AVATAR SECTION (disabled by default)
+        To enable: uncomment the div below and place
+        your profile picture as 'avatar.jpg' (or change the src).
+        You can also adjust styling in style.css under
+        the ".profile-avatar" section.
+        =============================================
+    -->
+    <!-- <div class="profile-avatar">
+        <img src="profile.jpg" alt="Your Name">
+    </div> -->
+        
+            <!-- <div class="profile-avatar">
+                <img src="profile.jpg" alt="Profile Photo">
+            </div> -->
+            <!-- Replace with your name and short bio -->
             <h1 class="name">Your Name</h1>
-            <p class="bio">Your Bio</p>
+            <p class="bio">Your bio or tagline</p>
         </header>
+
         <main>
-            <!-- Links will be dynamically injected here by script.js -->
+            <!-- Links will be injected here by JavaScript -->
             <div class="links-grid" id="links-container"></div>
 
-            <!-- ===================================================== -->
-            <!--  ADVANCED: Add Link Button (commented by default)   -->
-            <!-- ===================================================== -->
             <!--
-            <div style="text-align: center; margin-top: 2rem;">
+                =============================================
+                ADMIN PANEL (disabled by default)
+                To enable interactive link management (add/delete),
+                uncomment the button below and the corresponding
+                modal in the next comment block.
+                Also uncomment the CSS in style.css and the
+                JavaScript at the end of script.js.
+                WARNING: This allows any visitor to modify your links!
+                =============================================
+            -->
+            <!-- <div style="text-align: center; margin-top: 2rem;">
                 <button id="add-link-btn" class="add-btn">
                     <i class="fa-solid fa-plus"></i> Add New Link
                 </button>
-            </div>
-            -->
+            </div> -->
         </main>
+
         <footer>
-            <!-- Update the footer text as needed -->
-            <p>All rights reserved VEX© 2026</p>
+            <p>All rights reserved VEX&copy; 2026</p>
         </footer>
     </div>
 
-    <!-- ===================================================== -->
-    <!--  ADVANCED: Modal for adding/editing links (commented) -->
-    <!-- ===================================================== -->
-    <!--
-    <div id="link-modal" class="modal">
+    <!-- Admin Modal (commented) -->
+    <!-- <div id="link-modal" class="modal">
         <div class="modal-content">
             <span class="close-modal">&times;</span>
             <h2>Add / Edit Link</h2>
@@ -74,14 +82,14 @@
                 <div class="form-group">
                     <label for="link-icon">Icon class:</label>
                     <input type="text" id="link-icon" required placeholder="fa-brands fa-github">
-                    <small>From <a href="https://fontawesome.com/icons" target="_blank">Font Awesome</a></small>
+                    <small>Find icons at <a href="https://fontawesome.com/icons" target="_blank">Font Awesome</a></small>
                 </div>
                 <button type="submit" class="submit-btn">Save</button>
             </form>
         </div>
-    </div>
-    -->
+    </div> -->
 
     <script type="module" src="script.js"></script>
 </body>
+
 </html>

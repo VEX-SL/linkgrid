@@ -1,32 +1,16 @@
-/* style.css - Professional calm dark theme with customization features */
-
-/* ================= CUSTOMIZATION FEATURES ================= */
-/* 1. Root variables: adjust colors, transparency, spacing.   */
-/*    --bg-gradient-start, --accent, --card-bg, etc.          */
-/* 2. Change font: replace 'Inter' with any Google Font.      */
-/* 3. Animation speeds: modify transition and keyframe values.*/
-/* 4. Responsive breakpoints: edit @media queries for tablets */
-/*    and mobile devices.                                      */
-/* 5. Scrollbar styling: customize colors and dimensions.     */
-/* 6. Accessibility: prefers-reduced-motion support built-in. */
-/* =========================================================== */
+/* style.css - Professional quiet version with personal image added */
 
 :root {
-    /* Background & cards */
     --bg-gradient-start: #0b0f17;
     --bg-gradient-end: #1a1f2c;
-    --card-bg: rgba(30, 35, 45, 0.75);        /* Glass effect transparency */
-    --card-bg-hover: rgba(40, 45, 60, 0.85);   /* Hover state */
-    /* Text colors */
+    --card-bg: rgba(30, 35, 45, 0.75);
+    --card-bg-hover: rgba(40, 45, 60, 0.85);
     --text-primary: #ffffff;
     --text-secondary: #cbd5e0;
-    /* Accent colors */
     --accent: #5f7caf;
     --accent-light: #7c9bcf;
-    /* Borders & shadows */
     --border-light: rgba(95, 124, 175, 0.15);
     --shadow-color: rgba(0, 0, 0, 0.6);
-    /* Status colors */
     --success: #48bb78;
     --error: #f56565;
 }
@@ -38,14 +22,14 @@
 }
 
 body {
-    font-family: 'Inter', sans-serif;  /* Change font here if needed */
+    font-family: 'Inter', sans-serif;
     background: linear-gradient(145deg, var(--bg-gradient-start), var(--bg-gradient-end));
     color: var(--text-primary);
     min-height: 100vh;
     line-height: 1.5;
 }
 
-/* Soft background effect (static, no mouse movement) */
+/* Soft background effect (without mouse movement) */
 body::before {
     content: '';
     position: fixed;
@@ -60,43 +44,80 @@ body::before {
 }
 
 .container {
-    max-width: 1200px;          /* Adjust overall width */
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 2.5rem 2rem;
+    padding: 2.5rem 2rem;          /* Spacing from sides */
     min-height: 100vh;
     display: flex;
     flex-direction: column;
 }
 
-/* Header styles */
+/* Header */
 header {
     text-align: center;
     margin-bottom: 4rem;
+    padding-top: 1.5rem;            /* Spacing from top of page */
     animation: fadeInDown 0.7s ease-out;
 }
 
+/* ========== Personal image ========== */
+.profile-avatar {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.8rem;          /* Distance between image and name */
+}
+
+.profile-avatar img {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    object-fit: cover;
+
+    /* Professional multi-layer frame */
+    border: 3px solid transparent;
+    background-clip: padding-box;
+    box-shadow:
+        0 0 0 3px var(--accent),
+        0 0 0 6px rgba(95, 124, 175, 0.15),
+        0 12px 35px rgba(0, 0, 0, 0.45);
+
+    transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1),
+                box-shadow 0.35s ease;
+}
+
+.profile-avatar img:hover {
+    transform: scale(1.06) translateY(-3px);
+    box-shadow:
+        0 0 0 3px var(--accent-light),
+        0 0 0 6px rgba(124, 155, 207, 0.25),
+        0 20px 45px rgba(0, 0, 0, 0.55);
+}
+
+/* Name */
 .name {
-    font-size: 3.2rem;           /* Name size */
+    font-size: 3.2rem;
     font-weight: 600;
     background: linear-gradient(145deg, #ffffff, #d4e0ff);
     -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
     background-clip: text;
+    color: transparent;
     margin-bottom: 0.5rem;
     letter-spacing: -0.02em;
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
+/* Bio / Tagline */
 .bio {
-    font-size: 1.3rem;            /* Bio size */
+    font-size: 1.3rem;
     color: var(--text-secondary);
     max-width: 600px;
     margin: 0 auto;
     position: relative;
     padding: 0 1rem;
+    line-height: 1.6;
 }
 
-/* Decorative lines next to bio */
+/* Decorative lines */
 .bio::before,
 .bio::after {
     content: '';
@@ -116,7 +137,7 @@ header {
     right: -30px;
 }
 
-/* Links grid – responsive with auto-fit */
+/* Links grid */
 .links-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -125,7 +146,7 @@ header {
     flex: 1;
 }
 
-/* Card styling – glassmorphism */
+/* Cards - elegant glass design */
 .link-card {
     background: var(--card-bg);
     backdrop-filter: blur(8px);
@@ -146,7 +167,7 @@ header {
     overflow: hidden;
 }
 
-/* Subtle edge glow on hover */
+/* Subtle glow effect on edges */
 .link-card::after {
     content: '';
     position: absolute;
@@ -163,22 +184,19 @@ header {
     opacity: 1;
 }
 
-/* Icon inside card */
 .link-card i {
-    font-size: 2.8rem;           /* Icon size */
+    font-size: 2.8rem;
     color: var(--accent-light);
     transition: all 0.4s ease;
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
 }
 
-/* Text inside card */
 .link-card span {
-    font-size: 1.3rem;            /* Link text size */
+    font-size: 1.3rem;
     font-weight: 500;
     position: relative;
 }
 
-/* Underline animation on hover */
 .link-card span::after {
     content: '';
     position: absolute;
@@ -190,7 +208,6 @@ header {
     transition: width 0.4s ease;
 }
 
-/* Hover effects for card */
 .link-card:hover {
     transform: translateY(-10px) scale(1.02);
     background: var(--card-bg-hover);
@@ -208,7 +225,7 @@ header {
     width: 100%;
 }
 
-/* Footer styling */
+/* Footer */
 footer {
     text-align: center;
     padding: 2rem 0;
@@ -245,7 +262,7 @@ footer:hover {
     animation: spin 1s linear infinite;
 }
 
-/* Error message styling */
+/* Error message */
 .error {
     text-align: center;
     padding: 3rem;
@@ -282,7 +299,7 @@ footer:hover {
     transform: translateX(-50%) translateY(0);
 }
 
-/* Keyframe animations – customize timing if desired */
+/* Animations */
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -309,7 +326,7 @@ footer:hover {
     to { transform: rotate(360deg); }
 }
 
-/* Tablet responsiveness */
+/* Tablet improvements */
 @media (max-width: 768px) {
     .container { padding: 2rem 1.5rem; }
     .name { font-size: 2.8rem; }
@@ -323,179 +340,30 @@ footer:hover {
     .link-card span { font-size: 1.2rem; }
 }
 
-/* Mobile responsiveness */
+/* For small screens */
 @media (max-width: 480px) {
     .name { font-size: 2.3rem; }
     .bio::before, .bio::after { display: none; }
     .toast { width: 85%; text-align: center; padding: 0.9rem 1.5rem; }
 }
 
-/* Custom scrollbar */
+/* Elegant scrollbar */
 ::-webkit-scrollbar { width: 10px; }
 ::-webkit-scrollbar-track { background: var(--bg-gradient-start); }
 ::-webkit-scrollbar-thumb { background: #2d3748; border-radius: 8px; border: 2px solid var(--bg-gradient-start); }
 ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
-/* Accessibility: reduce motion if user prefers */
+/* Accessibility improvements */
 @media (prefers-reduced-motion: reduce) {
     * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
 
-/* Focus state for keyboard navigation */
 .link-card:focus-visible {
     outline: 3px solid var(--accent);
     outline-offset: 4px;
 }
 
-/* Text selection color */
 ::selection {
     background: var(--accent);
     color: #fff;
-}
-
-/* ========== ADVANCED INTERACTIVE CUSTOMIZATION ========== */
-/* The following styles are for the admin panel (Add button, modal, form, delete button). */
-/* Uncomment them if you enable the interactive link management feature. */
-/* ========================================================= */
-
-
-.add-btn {
-    background: var(--accent);
-    color: white;
-    border: none;
-    padding: 1rem 2rem;
-    border-radius: 60px;
-    font-size: 1.1rem;
-    font-weight: 500;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.8rem;
-    margin: 2rem auto;
-    transition: all 0.3s ease;
-    border: 1px solid rgba(255,255,255,0.1);
-}
-
-.add-btn:hover {
-    background: var(--accent-light);
-    transform: translateY(-3px);
-    box-shadow: 0 10px 25px rgba(95, 124, 175, 0.4);
-}
-
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 2000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.7);
-    backdrop-filter: blur(5px);
-}
-
-.modal-content {
-    background: var(--bg-secondary);
-    margin: 10% auto;
-    padding: 2.5rem;
-    border: 1px solid var(--border-light);
-    border-radius: 40px;
-    width: 90%;
-    max-width: 500px;
-    box-shadow: 0 30px 60px rgba(0,0,0,0.5);
-    animation: fadeInUp 0.4s;
-}
-
-.close-modal {
-    color: var(--text-secondary);
-    float: right;
-    font-size: 2rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: color 0.3s;
-}
-
-.close-modal:hover {
-    color: var(--accent);
-}
-
-.form-group {
-    margin-bottom: 1.8rem;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 0.6rem;
-    color: var(--text-primary);
-    font-weight: 500;
-}
-
-.form-group input {
-    width: 100%;
-    padding: 1rem 1.2rem;
-    background: var(--bg-card);
-    border: 1px solid var(--border-light);
-    border-radius: 30px;
-    color: var(--text-primary);
-    font-size: 1rem;
-    transition: all 0.3s;
-}
-
-.form-group input:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(95, 124, 175, 0.3);
-}
-
-.form-group small {
-    color: var(--text-secondary);
-    margin-top: 0.5rem;
-    display: block;
-}
-
-.submit-btn {
-    background: var(--accent);
-    color: white;
-    border: none;
-    padding: 1rem 2rem;
-    border-radius: 60px;
-    font-size: 1.1rem;
-    font-weight: 500;
-    cursor: pointer;
-    width: 100%;
-    transition: all 0.3s;
-}
-
-.submit-btn:hover {
-    background: var(--accent-light);
-    transform: translateY(-2px);
-}
-
-.delete-btn {
-    position: absolute;
-    top: -8px;
-    right: -8px;
-    background: var(--error);
-    color: white;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    font-weight: bold;
-    cursor: pointer;
-    opacity: 0;
-    transition: all 0.3s;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-}
-
-.link-card:hover .delete-btn {
-    opacity: 1;
-}
-
-.delete-btn:hover {
-    transform: scale(1.1);
-    background: #ff0000;
 }

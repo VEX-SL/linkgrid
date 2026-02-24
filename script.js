@@ -1,22 +1,9 @@
-// script.js - ES6 module for fetching and rendering links
-// ================= CUSTOMIZATION FEATURES =================
-// 1. Edit links.json to add/remove your personal links.
-// 2. Change toast messages and duration in showToast().
-// 3. Modify the fallback links in FALLBACK_LINKS constant.
-// 4. Adjust animation delays in renderLinks() (index * 0.1s).
-// 5. Enable/disable the background effect by uncommenting the mousemove event.
-// 6. Customize the loading and error messages.
-// ===========================================================
-
-// DOM elements
-// script.js - ES6 module for fetching and displaying links from links.json
-
 const linksContainer = document.getElementById('links-container');
 
-// ==================== Toast Notifications ====================
+// ========== Toast Notification ==========
 function showToast(message, duration = 3000) {
-    const existingToast = document.querySelector('.toast');
-    if (existingToast) existingToast.remove();
+    const existing = document.querySelector('.toast');
+    if (existing) existing.remove();
 
     const toast = document.createElement('div');
     toast.className = 'toast';
@@ -31,92 +18,69 @@ function showToast(message, duration = 3000) {
     }, duration);
 }
 
-// ==================== Data Fetching ====================
-async function fetchLinksFromJSON() {
+// ========== Data Fetching ==========
+async function fetchLinks() {
     try {
         const response = await fetch('links.json');
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
         return await response.json();
     } catch (error) {
-        console.error('Error fetching links from JSON:', error);
-        showToast('Failed to load links, using backup data', 4000);
-
-        // Very simple backup data
+        console.error('Failed to fetch links.json:', error);
+        showToast('Using fallback links', 4000);
+        // Fallback minimal links
         return [
-            { name: "GitHub", url: "https://github.com/VEX-SL", icon: "fa-brands fa-github" }
+            { name: "GitHub", url: "https://github.com/yourusername", icon: "fa-brands fa-github" },
+            { name: "LinkedIn", url: "https://linkedin.com/in/yourusername", icon: "fa-brands fa-linkedin" }
         ];
     }
 }
 
-function getLinksFromStorage() {
-    const saved = localStorage.getItem('userLinks');
-    if (saved) {
-        try {
-            return JSON.parse(saved);
-        } catch {
-            localStorage.removeItem('userLinks');
-        }
-    }
-    return null;
-}
-
-async function getLinks() {
-    // 1. Check localStorage first
-    const stored = getLinksFromStorage();
-    if (stored) return stored;
-
-    // 2. Then fetch from JSON
-    const jsonLinks = await fetchLinksFromJSON();
-    return jsonLinks;
-}
-
-// ==================== Rendering ====================
+// ========== Render Links ==========
 function renderLinks(links) {
     if (!linksContainer) return;
     linksContainer.innerHTML = '';
 
     links.forEach((link, index) => {
-        const linkCard = document.createElement('a');
-        linkCard.href = link.url;
-        linkCard.target = '_blank';
-        linkCard.rel = 'noopener noreferrer';
-        linkCard.className = 'link-card';
-        linkCard.style.animationDelay = `${index * 0.1}s`;
-        linkCard.innerHTML = `
+        const card = document.createElement('a');
+        card.href = link.url;
+        card.target = '_blank';
+        card.rel = 'noopener noreferrer';
+        card.className = 'link-card';
+        card.style.animationDelay = `${index * 0.1}s`;
+        card.innerHTML = `
             <i class="${link.icon}" aria-hidden="true"></i>
             <span>${link.name}</span>
         `;
-
-        linkCard.addEventListener('click', () => {
-            showToast(`Redirecting to ${link.name}...`, 2000);
-        });
-
-        linksContainer.appendChild(linkCard);
+        card.addEventListener('click', () => showToast(`Redirecting to ${link.name}...`, 2000));
+        linksContainer.appendChild(card);
     });
 }
 
-// ==================== Initialization ====================
+// ========== Initialization ==========
 async function init() {
-    try {
-        linksContainer.innerHTML = '<div class="loading">Links are loading...</div>';
-        const links = await getLinks();
-        renderLinks(links);
-
-        setTimeout(() => {
-            showToast('👋 Welcome to My Links Page!', 3000);
-        }, 500);
-    } catch (error) {
-        console.error('Error initializing the page:', error);
-        linksContainer.innerHTML = '<div class="error">An error occurred while loading links, please try again later.</div>';
-    }
+    linksContainer.innerHTML = '<div class="loading">Links are loading...</div>';
+    const links = await fetchLinks();
+    renderLinks(links);
+    setTimeout(() => showToast('👋 Welcome!', 3000), 500);
 }
 
 document.addEventListener('DOMContentLoaded', init);
 
-// ========== ADVANCED INTERACTIVE CUSTOMIZATION ==========
-// The following code enables an in‑page admin panel. 
-// To activate: uncomment the HTML in index.html and this section.
-// =========================================================
+// ========== Optional Avatar Interaction ==========
+
+/*const avatar = document.querySelector('.profile-avatar img');
+if (avatar) {
+    avatar.addEventListener('click', () => {
+        showToast('This is my avatar. ✨', 1500);
+    });
+}*/
+
+// ========== Advanced Admin Panel (commented) ==========
+/*
+   To enable interactive add/delete, uncomment the following code,
+   the corresponding HTML, and the CSS in style.css.
+   WARNING: This allows any visitor to modify your links.
+*/
 
 /*
 window.adminPanelEnabled = true;
@@ -169,15 +133,3 @@ if (linkForm) {
 // Re-render to show delete buttons
 getLinks().then(links => renderLinks(links));
 */
-
-// Optional interactive background effect (disabled by default)
-/* window.addEventListener('mousemove', (e) => {
-    const x = e.clientX / window.innerWidth;
-    const y = e.clientY / window.innerHeight;
-    
-    document.body.style.background = `
-        radial-gradient(circle at ${x * 100}% ${y * 100}%, 
-        rgba(66, 153, 225, 0.15), 
-        rgba(26, 32, 44, 0.9))
-    `;
-}); */
