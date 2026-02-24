@@ -10,10 +10,11 @@ A modern, lightning-fast, and fully customizable **link-in-bio** solution built 
 
 ---
 
-## ✨ **Features**
+## ✨ Features
 
 - **Dark & Calm Aesthetic** – Carefully chosen color palette reduces eye strain, with subtle glass‑morphism effects.
 - **Fully Responsive** – Looks great on mobile, tablet, and desktop.
+- **Profile Avatar Support** – Optional circular profile image with a professional glow frame.
 - **Easy Customization** – Update your links, icons, and personal info in seconds via a `links.json` file.
 - **Modern JavaScript (ES6+)** – Uses `async/await`, `fetch`, modules, and dynamic DOM rendering.
 - **Smooth Animations** – Staggered fade‑ins, hover effects, and a toast notification system.
@@ -23,29 +24,26 @@ A modern, lightning-fast, and fully customizable **link-in-bio** solution built 
 
 ---
 
-## 🆚 **Why LinkGrid?** (vs. other link-in-bio tools)
+## 🆚 Why LinkGrid? (vs. other link-in-bio tools)
 
 | Feature | LinkGrid | Linktree | Bio.link | Carrd |
 |---------|----------|----------|----------|-------|
 | **Self-hosted** | ✅ You own everything | ❌ Third‑party service | ❌ Third‑party service | ❌ Hosted on their platform |
-| **Performance** | ⚡ < 50ms load time (no bloat) | 🐢 Often heavy tracking | 🐑 Average | 🐇 Depends on plan |
-| **Customization** | 🎨 Unlimited (CSS variables) | 🎨 Limited to templates | 🎨 Basic | 🎨 Good but requires code |
+| **Performance** | ⚡ < 50ms load time | 🐢 Heavy tracking | 🐑 Average | 🐇 Depends on plan |
+| **Customization** | 🎨 Unlimited (CSS variables) | 🎨 Limited | 🎨 Basic | 🎨 Requires code |
 | **Price** | 💸 **Free forever** | 💸 Freemium / Pro | 💸 Freemium | 💸 Starts at $9/year |
-| **Watermark** | 🚫 No watermark | ⚠️ On free plan | ⚠️ On free plan | ⚠️ On free plan |
-| **Analytics** | 📊 Optional (you can add your own) | 📊 Built‑in (but basic) | 📊 Built‑in | 📊 Via integrations |
+| **Watermark** | 🚫 None | ⚠️ On free plan | ⚠️ On free plan | ⚠️ On free plan |
 | **Open Source** | 🌟 Yes (MIT) | ❌ Closed | ❌ Closed | ❌ Closed |
-
-**Bottom line:** LinkGrid gives you complete control, superior performance, and zero cost – perfect for developers who want to showcase their skills while maintaining a professional presence.
 
 ---
 
-## 🚀 **Live Demo**
+## 🚀 Live Demo
 
 👉 [View Live Demo](https://vexlinks.vercel.app)
 
 ---
 
-## 📸 **Screenshot**
+## 📸 Screenshot
 
 <div align="center">
   <img src="./screenshots/1.png" alt="Full view" width="45%" style="margin:5px"/>
@@ -53,24 +51,24 @@ A modern, lightning-fast, and fully customizable **link-in-bio** solution built 
 
 ---
 
-## 🛠️ **Technologies Used**
+## 🛠️ Technologies Used
 
 - **HTML5** – Semantic structure.
 - **CSS3** – Custom properties, Flexbox, Grid, animations, media queries.
 - **JavaScript (ES6+)** – Modules, Fetch API, Promises, DOM manipulation.
-- **Font Awesome 6** – Icon library (latest v6.7.2).
+- **Font Awesome 6** – Icon library (v6.7.2).
 - **Google Fonts (Inter)** – Clean, modern typography.
 
 ---
 
-## 📦 **Getting Started**
+## 📦 Getting Started
 
-### **Prerequisites**
+### Prerequisites
 
 - A modern web browser.
 - A local development server (e.g., [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) for VS Code) – required because `fetch` works over `http://`, not `file://`.
 
-### **Installation**
+### Installation
 
 1. **Clone the repository**
 
@@ -91,8 +89,6 @@ python3 -m http.server 8000
 
 Then visit `http://localhost:8000`.
 
-3. **Start customizing!** (See below)
-
 ---
 
 ## 🎨 Customization Guide
@@ -102,13 +98,102 @@ Then visit `http://localhost:8000`.
 Edit the `index.html` file:
 
 ```html
+<h1 class="name">Your Name</h1>
+<p class="bio">Your short bio or tagline</p>
+```
+
+---
+
+### 2. 🖼️ Profile Picture (Avatar)
+
+By default, the profile image is **disabled**. Follow these steps to enable and customize it.
+
+#### Step 1 – Add your image file
+
+Place your profile photo in the root of the project folder and name it `profile.jpg` (or any name you prefer):
+
+```
+linkgrid/
+├── profile.jpg   ← your photo goes here
+├── index.html
+├── style.css
+...
+```
+
+> Recommended: a square image (e.g. 300×300px or larger) for best results with the circular crop.
+
+#### Step 2 – Uncomment the avatar HTML in `index.html`
+
+Locate the commented-out block inside `<header>` and uncomment it:
+
+```html
+<!-- BEFORE (disabled) -->
+<!-- <div class="profile-avatar">
+    <img src="profile.jpg" alt="Your Name">
+</div> -->
+
+<!-- AFTER (enabled) -->
+<div class="profile-avatar">
+    <img src="profile.jpg" alt="Your Name">
+</div>
+```
+
+> Change `alt="Your Name"` to your actual name for better accessibility.
+
+#### Step 3 – (Optional) Customize the avatar appearance in `style.css`
+
+The avatar styling lives under the `.profile-avatar` and `.profile-avatar img` selectors. Here are the most useful tweaks:
+
+```css
+/* Change the avatar size */
+.profile-avatar img {
+    width: 110px;   /* ← increase or decrease */
+    height: 110px;  /* ← keep equal to width for a circle */
+}
+
+/* Change the glow ring color */
+:root {
+    --accent: #5f7caf;       /* ring color */
+    --accent-light: #7c9bcf; /* hover ring color */
+}
+
+/* Change the spacing between the avatar and the name */
+.profile-avatar {
+    margin-bottom: 1.8rem; /* ← adjust as needed */
+}
+```
+
+#### Step 4 – (Optional) Enable avatar click interaction
+
+In `script.js`, there is a commented-out block that shows a toast message when the avatar is clicked:
+
+```js
+// Uncomment to enable:
+const avatar = document.querySelector('.profile-avatar img');
+if (avatar) {
+    avatar.addEventListener('click', () => {
+        showToast('This is my avatar. ✨', 1500);
+    });
+}
+```
+
+#### Full Avatar Example
+
+After enabling, your `<header>` in `index.html` should look like this:
+
+```html
 <header>
-    <h1 class="name">Your Name</h1>
-    <p class="bio">Your short bio or tagline</p>
+    <div class="profile-avatar">
+        <img src="profile.jpg" alt="Ahmed Al-Rashidi">
+    </div>
+    <h1 class="name">Ahmed Al-Rashidi</h1>
+    <p class="bio">Full-Stack Developer · Open Source Enthusiast</p>
 </header>
 ```
 
-### 2. Links & Icons
+---
+
+### 3. Links & Icons
 
 All links are stored in `links.json`. Open it and modify the array:
 
@@ -129,50 +214,48 @@ All links are stored in `links.json`. Open it and modify the array:
 
 - `name` – Display name of the platform.
 - `url` – Full URL (including `https://`). For email, use `mailto:you@example.com`.
-- `icon` – Font Awesome 6 icon class. Find the complete list of available icons at [Font Awesome Icons](https://fontawesome.com/icons).
+- `icon` – Font Awesome 6 icon class. Find icons at [fontawesome.com/icons](https://fontawesome.com/icons).
 
 > **Note:** Icons like `fa-brands fa-x-twitter` (X/Twitter) and `fa-brands fa-signal-messenger` (Signal) are fully supported in Font Awesome 6.7.2+.
 
-### 3. Colors & Theme
+---
 
-The color scheme is controlled by CSS variables in `style.css` (inside `:root`). Tweak them to match your brand:
+### 4. Colors & Theme
+
+The color scheme is controlled by CSS variables inside `:root` in `style.css`:
 
 ```css
 :root {
-    --bg-primary: #0a0d12;
-    --bg-secondary: #14181f;
-    --bg-card: #1e242c;
-    --bg-card-hover: #2a313c;
-    --text-primary: #edf2f7;
-    --text-secondary: #a0b3c9;
-    --accent: #3182ce;
-    --accent-light: #5a9fd4;
-    /* ... */
+    --bg-gradient-start: #0b0f17;
+    --bg-gradient-end: #1a1f2c;
+    --accent: #5f7caf;
+    --accent-light: #7c9bcf;
+    --text-primary: #ffffff;
+    --text-secondary: #cbd5e0;
 }
 ```
 
-### 4. Animations & Effects
+---
+
+### 5. Animations & Effects
 
 - **Animation speeds** – Adjust `transition` and `animation` durations in the CSS.
 - **Hover effects** – Modify the `.link-card:hover` rules.
-- **Toast notifications** – Change the `showToast` function in `script.js` to alter message duration or styling.
-
-### 5. Add / Remove Links Dynamically (Optional)
-
-If you prefer an interactive editor, follow the instructions in the **Advanced Customization** section below.
+- **Toast notifications** – Change the `showToast` function in `script.js`.
 
 ---
 
 ## 📁 Project Structure
 
-```text
+```
 linkgrid/
-├── favicon.png         # Site Icon
+├── favicon.png         # Site icon
 ├── index.html          # Main HTML file
 ├── style.css           # All styles (dark theme, animations)
 ├── script.js           # JavaScript logic (fetch, render, toast)
 ├── links.json          # Your links data (easy to edit)
-├── screenshots/        # Folder for your screenshots
+├── profile.jpg         # Your profile photo (optional, add manually)
+├── screenshots/        # Folder for screenshots
 └── README.md           # This file
 ```
 
@@ -188,17 +271,7 @@ If you want to add/edit links directly from the browser, you can enable the buil
 2. Uncomment the corresponding CSS in `style.css` (the `.add-btn`, `.modal`, `.delete-btn` sections).
 3. Uncomment the JavaScript code at the bottom of `script.js` (the admin panel section).
 
-This will allow you to:
-
-- Click a button to open a modal.
-- Enter a new link (name, URL, icon) and save it.
-- Links are saved to `localStorage` and persist across sessions.
-- Delete links by clicking the "×" that appears on hover.
-
-> ⚠️ **Important Security Note:**  
-> The admin panel uses `localStorage` and is disabled by default. If you enable it, any visitor to your site will be able to add, edit, or delete links because the code runs entirely on the client side. This is fine for personal use or local testing, but **do not enable it on a public website** unless you implement proper authentication.
->
-> The recommended and safest way to manage your links is to edit the `links.json` file directly and redeploy your site. That way, you retain full control and no one else can modify your links.
+> ⚠️ **Security Warning:** The admin panel runs entirely on the client side. Any visitor to your site can add, edit, or delete links. Only enable it for local testing. For production, edit `links.json` directly and redeploy.
 
 ### Hosting on GitHub Pages
 
@@ -230,7 +303,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## 📬 Contact
 
-VEX – [@VEX_SL](https://twitter.com/VEX_SL) – vex@example.com
+VEX – [X (Twitter)](https://x.com/Ha1Hany2) – [Email](hamzaowad1713@gmail.com)
 
 Project Link: [https://github.com/VEX-SL/linkgrid](https://github.com/VEX-SL/linkgrid)
 
