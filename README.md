@@ -48,7 +48,7 @@ A modern, lightning-fast, and fully customizable **link-in-bio** solution built 
 ## 📸 **Screenshot**
 
 <div align="center">
-  <img src="./screenshots/1.png" alt="Full view" width="45%" style="margin:5px"/>
+  <img src="./screenshots/11.png" alt="Full view" width="45%" style="margin:5px"/>
 </div>
 
 ---
