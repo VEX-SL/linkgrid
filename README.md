@@ -1,3 +1,6 @@
+![Stars](https://img.shields.io/github/stars/VEX-SL/linkgrid?style=for-the-badge)
+![Forks](https://img.shields.io/github/forks/VEX-SL/linkgrid?style=for-the-badge)
+![License](https://img.shields.io/github/license/VEX-SL/linkgrid?style=for-the-badge)
 # LinkGrid 🌐
 
 A modern, lightning-fast, and fully customizable **link-in-bio** solution built with cutting-edge JavaScript (ES6+), CSS3, and HTML5. Designed for developers, creators, and professionals who want a stylish, performant, and self-hosted page to showcase their social links, portfolio, or contact info. With a **dark, eye-friendly theme** and smooth animations – ready to be dropped into your CV or personal website.
