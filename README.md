@@ -306,7 +306,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## 📬 Contact
 
-VEX – [X (Twitter)](https://x.com/Ha1Hany2) – [Email](mailto:hamzaowad1713@gmail.com)
+VEX – [X (Twitter)](https://x.com/VEX_SL_) – [Email](mailto:hamzaowad1713@gmail.com)
 
 Project Link: [https://github.com/VEX-SL/linkgrid](https://github.com/VEX-SL/linkgrid)
 
