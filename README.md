@@ -1,7 +1,6 @@
 # 🌐 LinkGrid
 
-::: {align="center"}
-`<img src="./assets/logo.png" alt="LinkGrid Logo" width="160" height="160">`{=html}
+<div align="center"> <img src="./assets/logo.png" alt="LinkGrid Logo" width="120" height="120">
 
 \# LinkGrid --- Self-Hosted Link Infrastructure
 
@@ -243,8 +242,4 @@ https://buymeacoffee.com/vex_sl
 
 ------------------------------------------------------------------------
 
-::: {align="center"}
-Built for Anyone.\
-Designed for control.\
-Engineered for performance.
-:::
+<div align="center"> **Made with ❤️ and JavaScript** ⭐ Star us on GitHub — it helps! </div>
