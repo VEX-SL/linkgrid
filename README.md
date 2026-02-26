@@ -37,7 +37,7 @@ A self-hosted, themeable link-in-bio platform with optional admin panel and zero
 
 ### 🌙 Elegant Theme (Default)
 
-<img src="./screenshots/elegant.png" alt="Elegant Theme" width="100%">
+<img src="./screenshots/1.png" alt="Elegant Theme" width="100%">
 
 ### 🎨 Theme Preview
 
