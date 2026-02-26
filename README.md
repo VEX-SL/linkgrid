@@ -1,7 +1,7 @@
 # 🌐 LinkGrid
 
 <div align="center">
-  <img src="./assets/logo.png" alt="LinkGrid Logo" width="120" height="120">
+  <img src="./assets/logo.png" alt="LinkGrid Logo" width="768" height="512">
 
   ### A Modern Self-Hosted Link-in-Bio Platform
   
