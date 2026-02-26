@@ -9,7 +9,6 @@
 [![Stars](https://img.shields.io/github/stars/VEX-SL/linkgrid?style=for-the-badge&logo=github)](https://github.com/VEX-SL/linkgrid/stargazers)
 [![Forks](https://img.shields.io/github/forks/VEX-SL/linkgrid?style=for-the-badge&logo=github)](https://github.com/VEX-SL/linkgrid/network/members)
 [![License](https://img.shields.io/github/license/VEX-SL/linkgrid?style=for-the-badge)](LICENSE)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge)](CONTRIBUTING.md)
 
 A self-hosted, themeable link-in-bio platform with optional admin panel and zero frontend dependencies.
 
