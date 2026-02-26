@@ -164,6 +164,122 @@ Open [http://localhost:3125](http://localhost:3125) 🎉
 
 ---
 
+# 🏗️ Architecture
+
+LinkGrid is built as a hybrid application -- it can run purely static
+(frontend only) or as a full-stack Node.js app with admin features and
+analytics.
+
+------------------------------------------------------------------------
+
+## Frontend (Static)
+
+### Pure Stack
+
+-   HTML / CSS / JavaScript
+-   No frameworks
+-   Minimal dependencies
+
+### Theming
+
+-   Uses CSS Variables
+-   All five themes are defined in `style.css`
+-   Theme toggled via a class on `<body>`
+
+### Dynamic Rendering
+
+-   `index.html` loads `settings.json` and `links.json` via `fetch()`
+-   Grid is generated dynamically using vanilla JavaScript
+
+### Favicon Auto-fetch
+
+When `"icon": "auto"` is set: - Script extracts the domain - Requests:
+`https://icons.duckduckgo.com/ip3/{domain}.ico`
+
+### Live Search
+
+-   Enabled with `"search": true` in `settings.json`
+-   Filters both name and URL
+-   Real-time filtering using a simple `filter()` loop
+
+> ⚠️ Search and admin drag‑&‑drop cannot be active simultaneously on the
+> same page. Use only one in production.
+
+### Drag & Drop
+
+-   Implemented with SortableJS when `adminPanel` is active
+-   After reordering, new sequence is sent to `/api/links` (backend
+    required)
+
+------------------------------------------------------------------------
+
+## Backend (Node.js + Express)
+
+### Express Server
+
+-   Serves static files
+-   Provides REST API endpoints
+
+### File-Based Storage
+
+All data resides in `public/data/`:
+
+-   `settings.json` -- User configuration
+-   `links.json` -- List of links
+-   `statistics.json` -- Auto-generated analytics
+
+### Analytics Pipeline
+
+1.  User clicks a link\
+2.  Frontend sends `POST /api/click` with `{ name, url }`\
+3.  Server extracts:
+    -   IP address
+    -   Geolocation (via geoip-lite)
+    -   Device type (via express-useragent)\
+4.  Server updates `statistics.json` incrementally
+
+### Admin Authentication
+
+-   Session-based protection for `/admin`
+-   Password stored in `settings.json` (plain text)
+-   For production: use HTTPS and hashing
+
+### Session Management
+
+-   Uses `express-session`
+
+------------------------------------------------------------------------
+
+## Data Flow
+
+    ┌─────────────┐      ┌─────────────────┐      ┌─────────────────┐
+    │  Browser    │ ──► │  Express API    │ ──► │  JSON Files     │
+    │ (index.html)│      │ (index.js)      │      │ (public/data/)  │
+    └─────────────┘      └─────────────────┘      └─────────────────┘
+           ▲                                               │
+           └───────────────────────────────────────────────┘
+                         (static files)
+
+------------------------------------------------------------------------
+
+## Why This Architecture?
+
+-   **Simplicity** -- No database setup required\
+-   **Performance** -- Lightweight, no ORM overhead\
+-   **Flexibility** -- Can be hosted static or on VPS\
+-   **Privacy** -- Full data ownership
+
+------------------------------------------------------------------------
+
+## Known Limitations
+
+-   Concurrent writes to JSON files are not locked (fine for low
+    traffic)
+-   IP geolocation is approximate (MaxMind GeoLite via geoip-lite)
+-   Admin password stored in plain text (add hashing for production)
+
+---
+
 ## 🧠 Advanced Features
 
 ### 🔍 Live Search
