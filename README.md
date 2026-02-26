@@ -1,6 +1,6 @@
 # 🌐 LinkGrid
 
-<div align="center"> <img src="./assets/logo.png" alt="LinkGrid Logo" width="120" height="120">
+<div align="center"> <img src="./assets/logo.png" alt="LinkGrid Logo">
 
 # LinkGrid --- Self-Hosted Link Infrastructure
 
