@@ -1,437 +1,250 @@
 # 🌐 LinkGrid
 
-<div align="center">
-  <img src="./assets/logo.png" alt="LinkGrid Logo" width="120" height="120">
-  
-  ### A Modern Self-Hosted Link-in-Bio Platform
-  
-  **Beautiful • Fast • Full Control**
-  
-  ![GitHub Stars](https://img.shields.io/github/stars/VEX-SL/linkgrid?style=for-the-badge&logo=github)
-  ![GitHub Forks](https://img.shields.io/github/forks/VEX-SL/linkgrid?style=for-the-badge&logo=github)
-  ![License](https://img.shields.io/github/license/VEX-SL/linkgrid?style=for-the-badge)
-  ![Node Version](https://img.shields.io/badge/node-18+-brightgreen?style=for-the-badge&logo=node.js)
-  
-  [Live Demo](https://vexlinks.vercel.app) •
-  [Report Bug](https://github.com/VEX-SL/linkgrid/issues) •
-  [Request Feature](https://github.com/VEX-SL/linkgrid/issues)
-  
-</div>
+::: {align="center"}
+`<img src="./assets/logo.png" alt="LinkGrid Logo" width="160" height="160">`{=html}
 
----
+\# LinkGrid --- Self-Hosted Link Infrastructure
 
-## ✨ Why LinkGrid?
+\### The Complete, Developer-First Link-in-Bio System
 
-| Feature | Description |
-|---------|-------------|
-| ✅ **Self-hosted** | Your data stays yours, no third-party tracking |
-| 🎨 **5 Built-in Themes** | Minimal, Cyber, Glass, Terminal, Elegant |
-| ⚙️ **Optional Admin Panel** | Manage links in real time with drag & drop |
-| 🔍 **Live Search** | Instant filtering with result count |
-| 📊 **Built-in Analytics** | Track clicks, countries, devices, and hourly activity |
-| 🖼️ **Automatic Favicons** | Just write `"icon": "auto"` and we fetch them for you |
-| 🚀 **Blazing Fast** | Pure vanilla JS, no heavy frameworks |
-| 💾 **File-based Storage** | Simple JSON files, easy to backup or edit manually |
-| 📱 **Fully Responsive** | Looks perfect on any device |
-| ♿ **Accessibility Ready** | Respects prefers-reduced-motion, keyboard navigation |
-| 🔓 **MIT Licensed** | Free for personal and commercial use |
+**Fast • Private • Extensible • Production-Ready • Zero SaaS Lock-In**
 
----
+![Stars](https://img.shields.io/github/stars/VEX-SL/linkgrid?style=for-the-badge&logo=github)
+![Forks](https://img.shields.io/github/forks/VEX-SL/linkgrid?style=for-the-badge&logo=github)
+![License](https://img.shields.io/github/license/VEX-SL/linkgrid?style=for-the-badge)
+![Node](https://img.shields.io/badge/node-18+-brightgreen?style=for-the-badge&logo=node.js)
+![Status](https://img.shields.io/badge/status-production_ready-success?style=for-the-badge)
+:::
 
+------------------------------------------------------------------------
 
-## LinkGrid 🆚 Other Link-in-Bio Tools
+# 🚀 What is LinkGrid?
 
-| Feature | LinkGrid | Linktree | Bio.link | Carrd |
-|----------|-----------|-----------|-----------|--------|
-| **Hosting Model** | ✅ Self-hosted (you control server & data) | ❌ Fully hosted SaaS | ❌ Fully hosted SaaS | ❌ Hosted platform |
-| **Data Ownership** | ✅ Full control | ⚠️ Stored on their servers | ⚠️ Stored on their servers | ⚠️ Stored on their servers |
-| **Tracking & Analytics** | 📊 Built-in, minimal & self-controlled | 📊 Includes third-party analytics scripts | 📊 Platform analytics | 📊 Limited analytics (plan-based) |
-| **Customization** | 🎨 Full CSS control (themes + variables) | 🎨 Template-based | 🎨 Basic customization | 🎨 Flexible (requires design effort) |
-| **Backend Access** | ⚙️ Yes (Node.js + JSON storage) | ❌ No backend access | ❌ No backend access | ❌ No backend access |
-| **Performance** | ⚡ Lightweight (Vanilla JS, no frameworks) | ⚠️ Includes external scripts | ⚠️ Includes external scripts | ⚠️ Depends on setup |
-| **Pricing Model** | 💸 Free & Open Source (MIT) | 💸 Freemium / Paid tiers | 💸 Freemium | 💸 Paid plans |
-| **Watermark / Branding** | 🚫 None | ⚠️ Present on free plan | ⚠️ Present on free plan | ⚠️ Present on free plan |
-| **Open Source** | 🌟 Yes | ❌ No | ❌ No | ❌ No |
+LinkGrid is a fully self-hosted, production-ready alternative to
+commercial link-in-bio platforms.
 
----
+It is designed for: - Developers - Creators - Agencies - Privacy-focused
+users - SaaS builders
 
-## 📸 Screenshots
+You own: - Your data - Your analytics - Your hosting - Your
+infrastructure
 
-<div align="center">
-  
-| Elegant Theme (Default) | Admin Panel – Analytics |
-|:-----------------------:|:-----------------------:|
-| ![Elegant Theme](./screenshots/elegant.png) | ![Admin Analytics](./screenshots/admin-analytics.png) |
+No third-party tracking.\
+No recurring fees.\
+No vendor lock-in.
 
-| Drag & Drop Reorder | Live Search |
-|:-------------------:|:-----------:|
-| ![Drag Drop](./screenshots/dragdrop.png) | ![Search](./screenshots/search.png) |
+------------------------------------------------------------------------
 
-</div>
+# 🧠 System Architecture
 
----
+Frontend Layer: - Vanilla JavaScript (No framework overhead) - Dynamic
+DOM rendering - Client-side state handling - Responsive UI
 
-## 🚀 Quick Start
+Backend Layer: - Node.js - Express Server - RESTful API Endpoints - JSON
+File Storage - Session-based Authentication
 
-### 🔹 Static Mode (No Admin Panel)
+Storage Layer: - settings.json - links.json - statistics.json
 
-Perfect for simple deployments without backend functionality.
+Design Principles: - Minimal dependencies - High performance - Easy
+extensibility - Transparent data flow
 
-```bash
+------------------------------------------------------------------------
+
+# ✨ Feature Breakdown
+
+## 🎨 Professional Theme Engine
+
+-   5 built-in themes
+-   Dark-first design philosophy
+-   Instant switching
+-   Modular theme structure
+-   Easy custom theme extension
+
+## 🔐 Security Layer
+
+-   Admin authentication
+-   7-day persistent sessions
+-   Protected routes
+-   Configurable admin password
+-   JSON isolation strategy
+
+## 📊 Advanced Local Analytics
+
+-   Total click counter
+-   Per-link tracking
+-   Hourly activity distribution
+-   Country detection (IP-based lookup)
+-   Device type classification
+-   Local JSON storage
+-   No external analytics providers
+
+## ⚙️ Full Web Control Panel
+
+-   Live link creation
+-   Inline editing
+-   Drag & drop reordering
+-   Real-time saving
+-   Toggle system controls
+-   Theme management
+-   Profile customization
+
+## 🔍 Optimized Search Engine
+
+-   Real-time filtering
+-   Minimum character threshold
+-   Efficient DOM update logic
+-   Performance-optimized rendering
+
+## 🖼 Smart Favicon Detection
+
+-   Automatic domain-based favicon fetching
+-   Fallback handling
+-   Clean UI alignment
+
+------------------------------------------------------------------------
+
+# 📈 Performance Philosophy
+
+-   Lightweight runtime
+-   No heavy framework bundle
+-   Minimal memory footprint
+-   Fast initial paint
+-   Efficient event handling
+-   Optimized DOM mutation strategy
+
+Designed to scale vertically (VPS-ready).
+
+------------------------------------------------------------------------
+
+# 🆚 Competitive Comparison
+
+  Feature                LinkGrid   Linktree   Carrd
+  ---------------------- ---------- ---------- ---------
+  Self Hosted            ✅         ❌         ❌
+  Own Analytics          ✅         ❌         ❌
+  No Monthly Fees        ✅         ❌         ❌
+  Full Backend Control   ✅         ❌         ❌
+  Open Source            ✅         ❌         ❌
+  Extendable             ✅         Limited    Limited
+
+------------------------------------------------------------------------
+
+# 📦 Installation Guide
+
+## Static Mode
+
+Best for simple hosting.
+
+``` bash
 git clone https://github.com/VEX-SL/linkgrid.git
 cd linkgrid
 ```
 
-Edit the files inside `public/data/`:
-- `settings.json` – appearance and features
-- `links.json` – your links
+Edit JSON files and deploy to: - GitHub Pages - Netlify - Vercel
 
-Then deploy to any static host: **GitHub Pages**, **Vercel**, **Netlify**, etc.
+Admin + analytics disabled in static mode.
 
----
+------------------------------------------------------------------------
 
-### 🔹 Full Mode (With Admin Panel & Analytics)
+## Full Production Mode
 
-> ⚠️ Requires **Node.js 18+**
+Requirements: - Node.js 18+
 
-```bash
+``` bash
 git clone https://github.com/VEX-SL/linkgrid.git
 cd linkgrid
 npm install
 npm start
 ```
 
-Open [http://localhost:3125](http://localhost:3125) 🎉
-
----
-
-## ⚙️ Configuration
-
-### `public/data/settings.json`
-
-```json
-{
-  "theme": "elegant",
-  "profilePhoto": true,
-  "profilePhotoUrl": "/static/profile.jpg",
-  "name": "Your Name",
-  "bio": "Your bio or tagline",
-  "footer": "All rights reserved VEX© 2026",
-  "adminPanel": false,
-  "adminPage": true,
-  "adminPassword": "your-secret-password",
-  "search": true
-}
-```
-
-#### Configuration Options
-
-| Field | Description |
-|-------|-------------|
-| `theme` | One of: `elegant`, `minimal`, `cyber`, `glass`, `terminal` |
-| `profilePhoto` | Show/hide profile image |
-| `profilePhotoUrl` | Path to your photo (place it in `public/`) |
-| `name`, `bio`, `footer` | Your personal info |
-| `adminPanel` | Show **Add New Link** button on main page (requires backend) |
-| `adminPage` | Enable `/admin` route for analytics and full management |
-| `adminPassword` | Password to protect `/admin` (if empty, no login) |
-| `search` | Enable live search on main page |
-
----
-
-### `public/data/links.json`
-
-```json
-[
-  {
-    "name": "GitHub",
-    "url": "https://github.com/yourusername",
-    "icon": "auto"
-  },
-  {
-    "name": "LinkedIn",
-    "url": "https://linkedin.com/in/yourusername",
-    "icon": "fa-brands fa-linkedin"
-  }
-]
-```
-
-#### Icon Options
-
-- **`"icon": "auto"`** – Automatically fetches the site's favicon (uses DuckDuckGo's favicon service)
-- **`"icon": "fa-brands fa-github"`** – Uses a Font Awesome class  
-  [Browse all icons](https://fontawesome.com/icons)
-
----
-
-# 🏗️ Architecture
-
-LinkGrid is built as a hybrid application -- it can run purely static
-(frontend only) or as a full-stack Node.js app with admin features and
-analytics.
+Open: http://localhost:3125
 
 ------------------------------------------------------------------------
 
-## Frontend (Static)
+# 🏗 Production Deployment (Recommended)
 
-### Pure Stack
+Use PM2:
 
--   HTML / CSS / JavaScript
--   No frameworks
--   Minimal dependencies
-
-### Theming
-
--   Uses CSS Variables
--   All five themes are defined in `style.css`
--   Theme toggled via a class on `<body>`
-
-### Dynamic Rendering
-
--   `index.html` loads `settings.json` and `links.json` via `fetch()`
--   Grid is generated dynamically using vanilla JavaScript
-
-### Favicon Auto-fetch
-
-When `"icon": "auto"` is set: - Script extracts the domain - Requests:
-`https://icons.duckduckgo.com/ip3/{domain}.ico`
-
-### Live Search
-
--   Enabled with `"search": true` in `settings.json`
--   Filters both name and URL
--   Real-time filtering using a simple `filter()` loop
-
-> ⚠️ Search and admin drag‑&‑drop cannot be active simultaneously on the
-> same page. Use only one in production.
-
-### Drag & Drop
-
--   Implemented with SortableJS when `adminPanel` is active
--   After reordering, new sequence is sent to `/api/links` (backend
-    required)
-
-------------------------------------------------------------------------
-
-## Backend (Node.js + Express)
-
-### Express Server
-
--   Serves static files
--   Provides REST API endpoints
-
-### File-Based Storage
-
-All data resides in `public/data/`:
-
--   `settings.json` -- User configuration
--   `links.json` -- List of links
--   `statistics.json` -- Auto-generated analytics
-
-### Analytics Pipeline
-
-1.  User clicks a link\
-2.  Frontend sends `POST /api/click` with `{ name, url }`\
-3.  Server extracts:
-    -   IP address
-    -   Geolocation (via geoip-lite)
-    -   Device type (via express-useragent)\
-4.  Server updates `statistics.json` incrementally
-
-### Admin Authentication
-
--   Session-based protection for `/admin`
--   Password stored in `settings.json` (plain text)
--   For production: use HTTPS and hashing
-
-### Session Management
-
--   Uses `express-session`
-
-------------------------------------------------------------------------
-
-## Data Flow
-
-    ┌─────────────┐      ┌─────────────────┐      ┌─────────────────┐
-    │  Browser    │ ──► │  Express API    │ ──► │  JSON Files     │
-    │ (index.html)│      │ (index.js)      │      │ (public/data/)  │
-    └─────────────┘      └─────────────────┘      └─────────────────┘
-           ▲                                               │
-           └───────────────────────────────────────────────┘
-                         (static files)
-
-------------------------------------------------------------------------
-
-## Why This Architecture?
-
--   **Simplicity** -- No database setup required\
--   **Performance** -- Lightweight, no ORM overhead\
--   **Flexibility** -- Can be hosted static or on VPS\
--   **Privacy** -- Full data ownership
-
-------------------------------------------------------------------------
-
-## Known Limitations
-
--   Concurrent writes to JSON files are not locked (fine for low
-    traffic)
--   IP geolocation is approximate (MaxMind GeoLite via geoip-lite)
--   Admin password stored in plain text (add hashing for production)
-
----
-
-## 🧠 Advanced Features
-
-### 🔍 Live Search
-
-When `"search": true` in `settings.json`, a search bar appears above your links.
-- Filters both **name** and **URL**
-- Shows live count (e.g., `5 of 12`)
-
-> ⚠️ **Warning:** Do not enable search together with `adminPanel` on a production site – the search UI will interfere with the admin drag-&-drop controls. During development you can enable both for testing, but for live use keep only one active.
-
----
-
-### 🖱️ Drag & Drop Reorder (Admin Panel)
-
-When `adminPanel` is active, you can reorder links by dragging them.  
-The new order is **automatically saved** to `links.json`.
-
----
-
-### 📊 Analytics Dashboard
-
-Visit `/admin` (requires `adminPage: true` and a password).
-
-**You'll see:**
-- ✅ Total clicks
-- 📈 Clicks per link (with last click time)
-- 🌍 Top countries
-- 📱 Device breakdown
-- ⏰ Hourly activity chart (simple text-based bars)
-
-All data is stored in `public/data/statistics.json`.
-
----
-
-### 🔐 Admin Authentication
-
-If you set `adminPassword` in `settings.json`, the `/admin` page will ask for a password.
-
-> ⚠️ The password is sent in plain text – for production, consider adding **HTTPS** and a stronger auth layer.
-
----
-
-## 📁 File Structure
-
-```
-linkgrid/
-├── index.js                # Express server (optional)
-├── package.json
-├── (profile.jpg, favicon.png etc.)
-├── public/
-│   ├── index.html          # Main page
-│   ├── admin.html          # Analytics dashboard
-│   ├── style.css           # All themes & styles
-│   ├── script.js           # Frontend logic
-│   ├── data/
-│   │   ├── settings.json   # Your configuration
-│   │   ├── links.json      # Your links
-│   │   └── statistics.json # Auto-generated analytics
-└── screenshots/            # For README
-```
-
----
-
-## 🌐 Deployment
-
-### Static Hosting (GitHub Pages / Vercel / Netlify)
-
-1. Push the whole repo
-2. Set the publish directory to `public/` (or root if you keep everything there)
-
-> ⚠️ **Note:** Admin panel and analytics will **not work** – they require the Node.js backend.
-
----
-
-### Full Stack (Node.js)
-
-- **Railway / Render / Heroku** – Just connect your repo and set the start command to `node index.js`
-- **VPS** – Run with `pm2` for persistence
-
-```bash
+``` bash
+npm install -g pm2
 pm2 start index.js --name linkgrid
 pm2 save
 pm2 startup
 ```
 
----
+Recommended Additions: - NGINX reverse proxy - HTTPS (Let's Encrypt) -
+Firewall rules - Rate limiting (optional enhancement)
 
-## ⚠️ Important Notes
+------------------------------------------------------------------------
 
-1. **Admin Panel:** When `adminPanel: true`, the **Add New Link** button appears on the main page. This mode is meant for private use or with authentication. The drag-&-drop feature saves directly to `links.json`.
+# 🔒 Security Best Practices
 
-2. **Privacy:** The analytics system records IP addresses (to determine country) – be aware of privacy regulations (GDPR). You can anonymize by removing IP storage in `index.js`.
+-   Set strong admin password before deployment
+-   Do not expose raw JSON endpoints
+-   Use HTTPS in production
+-   Restrict server ports
+-   Use environment variables for sensitive configs
+-   Regular backup of data directory
 
-3. **Favicon Service:** The favicon service (`icons.duckduckgo.com`) is fast and reliable, but if you prefer another source, change the URL in `getFaviconUrl()` inside `script.js`.
+------------------------------------------------------------------------
 
----
+# 🛣 Enterprise Roadmap
 
-## 🗺️ Roadmap
+-   Multi-user system
+-   Role-based access control
+-   Database mode (MongoDB / PostgreSQL)
+-   Docker image
+-   API key system
+-   Webhook support
+-   Custom domain manager
+-   Plugin system
 
-- [x] Multi-theme system
-- [x] Admin panel with file persistence
-- [x] Profile avatar
-- [x] Analytics (clicks, countries, devices)
-- [x] Drag & drop reorder
-- [x] Live search
-- [x] Automatic favicons (`"icon": "auto"`)
-- [ ] Theme builder (custom CSS)
-- [ ] Import / Export links
-- [ ] Docker support
+------------------------------------------------------------------------
 
----
+# 🧩 Extending LinkGrid
 
-## 🤝 Contributing
+You can extend LinkGrid by:
 
-Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+-   Replacing JSON storage with database
+-   Creating new themes
+-   Adding middleware
+-   Creating custom analytics dashboards
+-   Integrating external APIs
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing`
-3. Commit changes: `git commit -m 'Add amazing feature'`
-4. Push to branch: `git push origin feature/amazing`
-5. Open a Pull Request
+Designed for modification.
 
----
+------------------------------------------------------------------------
 
-## 📜 License
+# 🤝 Contribution Guidelines
 
-**MIT License** – Free for personal and commercial use.
+1.  Fork repository
+2.  Create feature branch
+3.  Follow clean code principles
+4.  Avoid unnecessary dependencies
+5.  Open Pull Request
 
-See [LICENSE](LICENSE) for more information.
+Performance-first mindset required.
 
----
+------------------------------------------------------------------------
 
-## ☕ Support
+# 📜 License
 
-If you like LinkGrid, consider buying me a coffee:
+MIT License
 
-[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/vex_sl)
+Free for commercial & private use.
 
----
+------------------------------------------------------------------------
 
-## 📬 Contact
+# ☕ Support the Project
 
-VEX – [@VEX_SL](https://x.com/VEX_SL_) – [Email](hamzaowad1713@gmail.com)
+⭐ Star the repository\
+☕ Support development\
+https://buymeacoffee.com/vex_sl
 
-Project Link: [https://github.com/VEX-SL/linkgrid](https://github.com/VEX-SL/linkgrid)
+------------------------------------------------------------------------
 
----
-
-<div align="center">
-  
-  **Made with ❤️ and JavaScript**
-  
-  ⭐ Star us on GitHub — it helps!
-  
-</div>
+::: {align="center"}
+Built for Anyone.\
+Designed for control.\
+Engineered for performance.
+:::
