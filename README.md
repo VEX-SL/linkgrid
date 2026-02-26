@@ -41,10 +41,9 @@ A self-hosted, themeable link-in-bio platform with optional admin panel and zero
 
 ### 🎨 Theme Preview
 
-| Minimal | Cyber | Glass | Terminal | Elegant |
-|---------|--------|--------|----------|----------|
-| ![](./screenshots/minimal.png) | ![](./screenshots/cyber.png) | ![](./screenshots/glass.png) | ![](./screenshots/terminal.png) | ![](./screenshots/elegant.png) |
-
+| Minimal | Cyber | Glass | Terminal |
+|---------|--------|--------|----------|
+| ![](./screenshots/minimal.png) | ![](./screenshots/cyber.png) | ![](./screenshots/glass.png) | ![](./screenshots/terminal.png) |
 ---
 
 ## 🚀 Quick Start
