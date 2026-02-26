@@ -2,9 +2,9 @@
 
 <div align="center"> <img src="./assets/logo.png" alt="LinkGrid Logo" width="120" height="120">
 
-\# LinkGrid --- Self-Hosted Link Infrastructure
+# LinkGrid --- Self-Hosted Link Infrastructure
 
-\### The Complete, Developer-First Link-in-Bio System
+### The Complete, Developer-First Link-in-Bio System
 
 **Fast • Private • Extensible • Production-Ready • Zero SaaS Lock-In**
 
