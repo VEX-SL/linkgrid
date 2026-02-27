@@ -85,15 +85,21 @@ LinkGrid is a **fully self-hosted, production-ready** alternative to commercial 
 
 ## 📸 Screenshots
 
+### 🌙 Elegant Theme (Default)
+
+<img src="./screenshots/1.png" alt="Elegant Theme" width="100%">
+
+### 🎨 Themes Preview
+
+| Minimal | Cyber | Glass | Terminal |
+|---------|--------|--------|----------|
+| ![](./screenshots/minimal.png) | ![](./screenshots/cyber.png) | ![](./screenshots/glass.png) | ![](./screenshots/terminal.png) |
+---
+
 <div align="center">
 
-| Elegant Theme (Default) | Admin Panel – Analytics |
-|:-----------------------:|:-----------------------:|
-| ![Elegant Theme](./screenshots/elegant.png) | ![Admin Analytics](./screenshots/admin-analytics.png) |
-
-| Drag & Drop Reorder | Live Search |
-|:-------------------:|:-----------:|
-| ![Drag Drop](./screenshots/dragdrop.png) | ![Search](./screenshots/search.png) |
+| Admin Panel – Analytics | Drag & Drop Reorder | Live Search |
+| ![Admin Analytics](./screenshots/admin-analytics.png) | ![Drag Drop](./screenshots/dragdrop.png) | ![Search](./screenshots/search.png) |
 
 </div>
 
