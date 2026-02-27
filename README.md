@@ -114,7 +114,7 @@ npm install
 npm start
 ```
 
-**Access your site:** Open [http://localhost:3125](http://localhost:3125)
+**Access your site:** Open [http://localhost:3000](http://localhost:3000)
 
 ---
 
