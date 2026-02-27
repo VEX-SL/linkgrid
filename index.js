@@ -1,35 +1,38 @@
-// index.js (Final version with improved session handling, logout, ip-api.com geolocation, and real client IP extraction)
+// index.js - Main server file for LinkGrid
 const express = require('express');
 const path = require('path');
 const fs = require('fs').promises;
 const geoip = require('geoip-lite');
 const useragent = require('express-useragent');
 const multer = require('multer');
+const session = require('express-session');
+const bcrypt = require('bcrypt'); // For password hashing
 
 const app = express();
 const port = 3125;
 const environment = process.env.NODE_ENV || 'development';
+const saltRounds = 10; // Number of salt rounds for bcrypt
 
 // ==================== MIDDLEWARE ====================
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use('/static', express.static(path.join(__dirname, 'public')));
-app.use(useragent.express());
+app.use(useragent.express()); // Adds device info to req.useragent
 
 // Trust proxy (Railway, Render, etc.) – important for getting real client IP
-app.set('trust proxy', true); // or 1 if only one proxy
+app.set('trust proxy', true);
 
 // ==================== SESSION SETUP ====================
-const session = require('express-session');
 let sessionStore;
 
+// Use FileStore in production, MemoryStore in development
 if (process.env.NODE_ENV === 'production') {
     const FileStore = require('session-file-store')(session);
     sessionStore = new FileStore({
         path: path.join(__dirname, 'sessions'),
-        ttl: 86400,
+        ttl: 86400, // 1 day in seconds
         retries: 0,
-        reapInterval: 3600
+        reapInterval: 3600 // Clean expired sessions every hour
     });
     console.log('Using FileStore for sessions (production)');
 } else {
@@ -115,11 +118,13 @@ async function updateStatistics(linkName, linkUrl, req) {
         try {
             const data = await fs.readFile(statsPath, 'utf8');
             stats = JSON.parse(data);
-        } catch (err) {}
+        } catch (err) {
+            // File doesn't exist, use default structure
+        }
 
         // Get real client IP
         const ip = getClientIp(req);
-        console.log('Client IP for analytics:', ip); // for debugging
+        console.log('Client IP for analytics:', ip); // For debugging
 
         let country = 'Unknown';
 
@@ -205,6 +210,7 @@ app.post('/api/links', async (req, res) => {
 });
 
 // ==================== ANALYTICS ====================
+// Record a click
 app.post('/api/click', async (req, res) => {
     try {
         const { name, url } = req.body;
@@ -223,6 +229,7 @@ app.post('/api/click', async (req, res) => {
     }
 });
 
+// API to fetch analytics data
 app.get('/api/analytics', async (req, res) => {
     try {
         const statsPath = path.join(__dirname, 'public', 'data', 'statistics.json');
@@ -230,7 +237,9 @@ app.get('/api/analytics', async (req, res) => {
         try {
             const data = await fs.readFile(statsPath, 'utf8');
             stats = JSON.parse(data);
-        } catch (err) {}
+        } catch (err) {
+            // File doesn't exist, return empty structure
+        }
         res.json(stats);
     } catch (error) {
         console.error('Error reading analytics:', error);
@@ -277,7 +286,18 @@ app.post('/admin/login', express.urlencoded({ extended: true }), async (req, res
         const settingsData = await fs.readFile(settingsPath, 'utf8');
         const settings = JSON.parse(settingsData);
 
-        if (settings.adminPassword && settings.adminPassword === password) {
+        let isMatch = false;
+        if (settings.adminPassword) {
+            // Check if stored password is bcrypt hash
+            if (settings.adminPassword.startsWith('$2b$') || settings.adminPassword.startsWith('$2a$')) {
+                isMatch = await bcrypt.compare(password, settings.adminPassword);
+            } else {
+                // Backward compatibility with plain text passwords
+                isMatch = (settings.adminPassword === password);
+            }
+        }
+
+        if (isMatch) {
             req.session.adminAuthenticated = true;
             req.session.save((err) => {
                 if (err) console.error('Session save error:', err);
@@ -307,6 +327,7 @@ app.post('/admin/login', express.urlencoded({ extended: true }), async (req, res
             `);
         }
     } catch (error) {
+        console.error(error);
         res.status(500).send('Error');
     }
 });
@@ -350,7 +371,7 @@ app.get('/admin', async (req, res) => {
     }
 });
 
-// Improved logout route
+// Logout route
 app.get('/admin/logout', (req, res) => {
     req.session.destroy((err) => {
         if (err) console.error('Error destroying session:', err);
@@ -366,6 +387,7 @@ app.get('/settings', async (req, res) => {
         const settingsData = await fs.readFile(settingsPath, 'utf8');
         const settings = JSON.parse(settingsData);
 
+        // If there's a session error parameter, force session destruction and show login
         if (req.query.error === 'session') {
             if (req.session) {
                 req.session.destroy(() => {});
@@ -373,6 +395,7 @@ app.get('/settings', async (req, res) => {
             return showSettingsLogin(res, 'Your session has expired. Please login again.');
         }
 
+        // Normal authentication check
         if (settings.adminPassword && !req.session.adminAuthenticated) {
             return showSettingsLogin(res);
         }
@@ -383,6 +406,7 @@ app.get('/settings', async (req, res) => {
     }
 });
 
+// Helper to display settings login page
 function showSettingsLogin(res, errorMsg = '') {
     res.send(`
         <!DOCTYPE html>
@@ -418,7 +442,16 @@ app.post('/settings/login', express.urlencoded({ extended: true }), async (req, 
         const settingsData = await fs.readFile(settingsPath, 'utf8');
         const settings = JSON.parse(settingsData);
 
-        if (settings.adminPassword && settings.adminPassword === password) {
+        let isMatch = false;
+        if (settings.adminPassword) {
+            if (settings.adminPassword.startsWith('$2b$') || settings.adminPassword.startsWith('$2a$')) {
+                isMatch = await bcrypt.compare(password, settings.adminPassword);
+            } else {
+                isMatch = (settings.adminPassword === password);
+            }
+        }
+
+        if (isMatch) {
             req.session.adminAuthenticated = true;
             req.session.save((err) => {
                 if (err) console.error('Session save error:', err);
@@ -428,6 +461,7 @@ app.post('/settings/login', express.urlencoded({ extended: true }), async (req, 
             showSettingsLogin(res, 'Invalid password');
         }
     } catch (error) {
+        console.error(error);
         res.status(500).send('Error');
     }
 });
@@ -461,11 +495,17 @@ app.post('/settings', upload.single('profilePhotoFile'), async (req, res) => {
         settings.search = newSearch;
         settings.adminPage = adminPage === 'on';
         settings.security = newSecurity;
+        
+        // Handle password: if a new password is provided (non-empty), hash it
         if (adminPassword && adminPassword.trim() !== '') {
-            settings.adminPassword = adminPassword;
+            const hashedPassword = await bcrypt.hash(adminPassword, saltRounds);
+            settings.adminPassword = hashedPassword;
         }
+        // If empty, keep the current password (no change)
+
         settings.profilePhoto = profilePhoto === 'on';
 
+        // Handle file upload
         if (req.file) {
             const oldPath = req.file.path;
             const ext = path.extname(req.file.originalname);
@@ -483,6 +523,7 @@ app.post('/settings', upload.single('profilePhotoFile'), async (req, res) => {
     }
 });
 
+// Optional: dedicated logout for settings
 app.get('/settings/logout', (req, res) => {
     req.session.destroy((err) => {
         if (err) console.error('Error destroying session:', err);
@@ -491,11 +532,12 @@ app.get('/settings/logout', (req, res) => {
     });
 });
 
+// Favicon endpoint (uses settings.json to get custom favicon)
 app.get('/docs/favicon', (req, res) => {
-    let f = require('fs');
-    let settings = f.readFileSync(path.join(__dirname, 'public', 'data', 'settings.json'), 'utf8');
-    settings = JSON.parse(settings);
-    let favicon = settings.faviconUrl || '/favicon.ico';
+    const f = require('fs');
+    const settings = f.readFileSync(path.join(__dirname, 'public', 'data', 'settings.json'), 'utf8');
+    const parsed = JSON.parse(settings);
+    const favicon = parsed.faviconUrl || '/favicon.ico';
     res.sendFile(path.join(__dirname, 'public', favicon));
 });
 
@@ -505,6 +547,4 @@ app.use((req, res) => {
 });
 
 // ==================== START SERVER ====================
-app.listen(port, () => {
-    console.log(`Server running on port ${port} in ${environment} mode`);
-});
+app.listen(port);
