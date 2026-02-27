@@ -144,13 +144,12 @@ Visit **`http://localhost:3125/settings`** to customize:
 
 ### 🔗 Managing Your Links
 
-From the **`/admin`** page, you can:
+From the **`Admin Panel`**, you can:
 
 - ➕ Add new links
 - ✏️ Edit existing links
 - 🗑️ Delete links
 - 🖱️ Drag & drop to reorder
-- 📊 View click statistics
 
 ---
 
@@ -171,8 +170,8 @@ From the **`/admin`** page, you can:
 
 If you forget your password, you can retrieve it from:
 - **File location:** `public/data/settings.json`
-- Look for the `"adminPassword"` field
-- You can edit this file directly to reset your password
+- Look for the `"adminPassword"` field, and type any password
+- After it, go to **`/settings`** page and reset your password again
 
 **Security Best Practices:**
 - ✅ Use a strong, unique password
