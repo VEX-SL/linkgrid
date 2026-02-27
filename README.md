@@ -98,7 +98,7 @@ LinkGrid is a **fully self-hosted, production-ready** alternative to commercial 
 
 | Settings Page | Admin Page | Admin Panel | Live Search |
 |---------|--------|--------|----------|
-| <img src="./screenshots/settings.png" width="651" height="764"> | ![](./screenshots/admin-analytics.png) | <img src="./screenshots/admin.png" width="607.5" height="495.5"> | <img src="./screenshots/search.png" width="651" height="458"> |
+| <img src="./screenshots/settings.png" width="651" height="764"> | ![](./screenshots/admin-analytics.png) | <img src="./screenshots/admin.png" width="495.5" height="607.5"> | <img src="./screenshots/search.png" width="651" height="458"> |
 ---
 ## 🚀 Quick Start
 
