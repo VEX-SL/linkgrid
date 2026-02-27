@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics - LinkGird</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="icon" href="/docs/favicon">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --bg: #0f1115;
+            --card: #181b22;
+            --card-2: #1f2430;
+            --border: #2a2f3a;
+            --text: #f1f3f7;
+            --text-muted: #9aa4b2;
+            --accent: #7c5cff;
+            --accent-soft: rgba(124, 92, 255, 0.15);
+            --danger: #ff4d6d;
+            --success: #10b981;
+        }
+
+        /* Base */
+        body {
+            background: radial-gradient(circle at top, #141824, #0f1115 60%);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .analytics-container {
+            max-width: 1200px;
+            margin: 3rem auto;
+            padding: 3rem;
+            background: var(--card);
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+        }
+
+        .header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-left {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .back-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: .2s;
+        }
+
+        .back-link:hover {
+            color: var(--accent);
+        }
+
+        .refresh-btn {
+            background: var(--accent);
+            border: none;
+            padding: .9rem 1.8rem;
+            border-radius: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: .25s;
+            color: white;
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px var(--accent-soft);
+        }
+
+        .reset-btn {
+            background: var(--danger);
+            border: none;
+            padding: .9rem 1.8rem;
+            border-radius: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: .25s;
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .reset-btn:hover {
+            background: #ff3355;
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(255, 77, 109, 0.3);
+        }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: var(--card-2);
+            padding: 2rem;
+            border-radius: 18px;
+            border: 1px solid var(--border);
+            transition: .3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+        }
+
+        .stat-card h3 {
+            font-size: .9rem;
+            color: var(--text-muted);
+            margin-bottom: .7rem;
+        }
+
+        .stat-card .value {
+            font-size: 2.4rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        /* Charts */
+        .chart-container {
+            background: var(--card-2);
+            padding: 2rem;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            margin-bottom: 2rem;
+        }
+
+        .flex-row {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .flex-item {
+            flex: 1 1 300px;
+        }
+
+        /* Lists */
+        .countries-list li,
+        .devices-list li {
+            display: flex;
+            justify-content: space-between;
+            padding: .8rem 0;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th {
+            text-align: left;
+            font-size: .85rem;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: var(--text-muted);
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        th:hover {
+            color: var(--accent);
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:hover {
+            background: var(--card-2);
+        }
+
+        .clicks-badge {
+            background: var(--accent-soft);
+            color: var(--accent);
+            padding: .4rem 1rem;
+            border-radius: 999px;
+            font-weight: 600;
+        }
+
+        .last-clicked {
+            font-size: .85rem;
+            color: var(--text-muted);
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 4rem;
+            color: var(--text-muted);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: var(--card);
+            margin: 15% auto;
+            padding: 2.5rem;
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+            animation: fadeInUp 0.4s;
+        }
+
+        .modal-content h2 {
+            color: var(--text);
+            margin-bottom: 1rem;
+        }
+
+        .modal-content p {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 0.8rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: .2s;
+            border: none;
+        }
+
+        .modal-btn.cancel {
+            background: var(--card-2);
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+        }
+
+        .modal-btn.cancel:hover {
+            background: var(--border);
+            color: var(--text);
+        }
+
+        .modal-btn.confirm {
+            background: var(--danger);
+            color: white;
+        }
+
+        .modal-btn.confirm:hover {
+            background: #ff3355;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 77, 109, 0.4);
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header-actions">
+            <div class="header-left">
+                <a href="/" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back to Links</a>
+                <button class="refresh-btn" onclick="fetchAnalytics()">
+                    <i class="fa-solid fa-rotate"></i> Refresh
+                </button>
+            </div>
+            <div>
+                <button class="reset-btn" onclick="showResetModal()">
+                    <i class="fa-solid fa-trash-can"></i> Reset All Stats
+                </button>
+                <a href="/admin/logout" class="back-link" style="color: var(--error); margin-left: 1rem;">Logout</a>
+            </div>
+        </div>
+
+        <div class="analytics-container">
+            <h1 style="margin-bottom: 2rem; color: var(--text-primary);">📊 Advanced Link Analytics</h1>
+
+            <div id="loading" class="loading">Loading analytics...</div>
+
+            <div id="content" style="display: none;">
+                <!-- Quick Stats -->
+                <div class="stats-grid" id="quick-stats"></div>
+
+                <!-- Hourly Chart -->
+                <div class="chart-container">
+                    <h3 style="margin-bottom: 1rem; color: var(--text-primary);">Peak Hours (Last 24h)</h3>
+                    <canvas id="hourlyChart" style="max-height: 300px;"></canvas>
+                </div>
+
+                <!-- Countries and Devices Distribution -->
+                <div class="flex-row">
+                    <div class="flex-item chart-container">
+                        <h3 style="margin-bottom: 1rem; color: var(--text-primary);">Top Countries</h3>
+                        <ul class="countries-list" id="countries-list"></ul>
+                    </div>
+                    <div class="flex-item chart-container">
+                        <h3 style="margin-bottom: 1rem; color: var(--text-primary);">Devices</h3>
+                        <ul class="devices-list" id="devices-list"></ul>
+                    </div>
+                </div>
+
+                <!-- Links Table -->
+                <h3 style="margin: 2rem 0 1rem; color: var(--text-primary);">Link Details</h3>
+                <table id="analytics-table">
+                    <thead>
+                        <tr>
+                            <th data-sort="name">Name <span class="sort-icon"><i class="fa-solid fa-sort"></i></span>
+                            </th>
+                            <th>URL</th>
+                            <th data-sort="clicks" style="text-align: center;">Clicks <span class="sort-icon"><i
+                                        class="fa-solid fa-sort"></i></span></th>
+                            <th data-sort="lastClicked">Last Clicked <span class="sort-icon"><i
+                                        class="fa-solid fa-sort"></i></span></th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reset Confirmation Modal -->
+    <div id="resetModal" class="modal">
+        <div class="modal-content">
+            <h2><i class="fa-solid fa-triangle-exclamation" style="color: var(--danger);"></i> Reset All Statistics</h2>
+            <p>Are you sure you want to reset all analytics data? This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="hideResetModal()">Cancel</button>
+                <button class="modal-btn confirm" onclick="resetAnalytics()">Yes, Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let statsData = null;
+        let sortField = 'clicks';
+        let sortDirection = 'desc';
+        let hourlyChart = null;
+
+        async function fetchAnalytics() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('content').style.display = 'none';
+
+            try {
+                const response = await fetch('/api/analytics');
+                if (!response.ok) throw new Error('Failed to fetch');
+                statsData = await response.json();
+
+                // Ensure required structure exists
+                if (!statsData.totals) statsData.totals = {};
+                if (!statsData.links) statsData.links = [];
+
+                renderDashboard();
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+            } catch (error) {
+                document.getElementById('loading').innerHTML = 'Error loading data. <a href="/admin">Try again</a>';
+            }
+        }
+
+        function renderDashboard() {
+            renderQuickStats();
+            renderHourlyChart();
+            renderCountries();
+            renderDevices();
+            renderTable();
+        }
+
+        function renderQuickStats() {
+            const totals = statsData.totals || {};
+            const totalClicks = totals.totalClicks || 0;
+
+            // Calculate clicks in last 24 hours (sum of last 24 entries in hourly)
+            const hourly = totals.hourly || new Array(24).fill(0);
+            const last24h = hourly.reduce((a, b) => a + b, 0);
+
+            const uniqueLinks = statsData.links.length;
+
+            const html = `
+                <div class="stat-card">
+                    <h3>Total Clicks</h3>
+                    <div class="value">${totalClicks}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Last 24h Clicks</h3>
+                    <div class="value">${last24h}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Unique Links</h3>
+                    <div class="value">${uniqueLinks}</div>
+                </div>
+            `;
+            document.getElementById('quick-stats').innerHTML = html;
+        }
+
+        function renderHourlyChart() {
+            const ctx = document.getElementById('hourlyChart').getContext('2d');
+            const hourly = statsData.totals.hourly || new Array(24).fill(0);
+
+            // Destroy previous chart if exists
+            if (hourlyChart) hourlyChart.destroy();
+
+            hourlyChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({ length: 24 }, (_, i) => i + ':00'),
+                    datasets: [{
+                        label: 'Clicks',
+                        data: hourly,
+                        borderColor: '#5f7caf',
+                        backgroundColor: 'rgba(95, 124, 175, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        function renderCountries() {
+            const countries = statsData.totals.countries || {};
+            const sorted = Object.entries(countries).sort((a, b) => b[1] - a[1]);
+            const list = document.getElementById('countries-list');
+            list.innerHTML = sorted.map(([country, count]) => `
+                <li><span>${country}</span> <strong>${count}</strong></li>
+            `).join('');
+        }
+
+        function renderDevices() {
+            const devices = statsData.totals.devices || {};
+            const sorted = Object.entries(devices).sort((a, b) => b[1] - a[1]);
+            const list = document.getElementById('devices-list');
+            list.innerHTML = sorted.map(([device, count]) => `
+                <li><span>${device.charAt(0).toUpperCase() + device.slice(1)}</span> <strong>${count}</strong></li>
+            `).join('');
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('table-body');
+            const links = statsData.links || [];
+
+            // Sort by current field
+            const sorted = [...links].sort((a, b) => {
+                let valA = a[sortField];
+                let valB = b[sortField];
+
+                if (sortField === 'lastClicked') {
+                    valA = valA ? new Date(valA).getTime() : 0;
+                    valB = valB ? new Date(valB).getTime() : 0;
+                } else if (typeof valA === 'string') {
+                    valA = valA.toLowerCase();
+                    valB = valB.toLowerCase();
+                }
+
+                if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
+                if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            tbody.innerHTML = '';
+            sorted.forEach(link => {
+                const lastClicked = link.lastClicked
+                    ? new Date(link.lastClicked).toLocaleString()
+                    : 'Never';
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${link.name}</td>
+                    <td><a href="${link.url}" target="_blank" rel="noopener" style="color: var(--accent);">${link.url}</a></td>
+                    <td style="text-align: center;"><span class="clicks-badge">${link.clicks || 0}</span></td>
+                    <td class="last-clicked">${lastClicked}</td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            // Update sort icons
+            document.querySelectorAll('.sort-icon i').forEach(icon => {
+                icon.className = 'fa-solid fa-sort';
+            });
+            const activeTh = document.querySelector(`th[data-sort="${sortField}"]`);
+            if (activeTh) {
+                const icon = activeTh.querySelector('.sort-icon i');
+                icon.className = sortDirection === 'asc' ? 'fa-solid fa-sort-up' : 'fa-solid fa-sort-down';
+            }
+        }
+
+        // Add sort event listeners
+        document.querySelectorAll('th[data-sort]').forEach(th => {
+            th.addEventListener('click', () => {
+                const field = th.dataset.sort;
+                if (field === sortField) {
+                    sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+                } else {
+                    sortField = field;
+                    sortDirection = 'asc';
+                }
+                renderTable();
+            });
+        });
+
+        // Modal functions
+        function showResetModal() {
+            document.getElementById('resetModal').style.display = 'block';
+        }
+
+        function hideResetModal() {
+            document.getElementById('resetModal').style.display = 'none';
+        }
+
+        // Reset analytics function
+        async function resetAnalytics() {
+            hideResetModal();
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('content').style.display = 'none';
+
+            try {
+                const response = await fetch('/api/analytics/reset', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) throw new Error('Failed to reset');
+
+                // Refresh data
+                await fetchAnalytics();
+                
+                // Show success message (optional)
+                alert('Analytics data has been reset successfully.');
+            } catch (error) {
+                console.error('Reset error:', error);
+                document.getElementById('loading').innerHTML = 'Error resetting data. <a href="/admin">Try again</a>';
+            }
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+            const modal = document.getElementById('resetModal');
+            if (e.target === modal) {
+                hideResetModal();
+            }
+        });
+
+        // Start loading
+        fetchAnalytics();
+    </script>
+</body>
+
+</html>
