@@ -9,7 +9,7 @@ const session = require('express-session');
 const bcrypt = require('bcrypt'); // For password hashing
 
 const app = express();
-const port = 3125;
+const port = 3000;
 const environment = process.env.NODE_ENV || 'development';
 const saltRounds = 10; // Number of salt rounds for bcrypt
 
@@ -548,3 +548,4 @@ app.use((req, res) => {
 
 // ==================== START SERVER ====================
 app.listen(port);
+
