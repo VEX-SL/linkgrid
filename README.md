@@ -13,7 +13,7 @@
   ![Node Version](https://img.shields.io/badge/node-18+-brightgreen?style=for-the-badge&logo=node.js)
   ![Status](https://img.shields.io/badge/status-production_ready-success?style=for-the-badge)
 
-  [Live Demo](https://vexlinks.up.railway.app) • [Report Bug](https://github.com/VEX-SL/linkgrid/issues) • [Request Feature](https://github.com/VEX-SL/linkgrid/issues)
+  [Live Demo](https://links--vex-sl.replit.app/) • [Report Bug](https://github.com/VEX-SL/linkgrid/issues) • [Request Feature](https://github.com/VEX-SL/linkgrid/issues)
 </div>
 
 ---
