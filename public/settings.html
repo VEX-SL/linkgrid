@@ -1,4 +1,4 @@
-<!-- public/settings.html (Final version with full theme compatibility) -->
+<!-- public/settings.html (مع الحصول على الإعدادات من JSONbin عبر API) -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -422,18 +422,19 @@
         const toggleFields = ['profilePhoto', 'adminPanel', 'adminPage', 'search', 'security'];
         let currentSettings = {};
 
-        // Load current settings and populate form
+        // Load current settings from API (JSONbin via backend)
         async function loadSettings() {
             try {
-                const response = await fetch('/static/data/settings.json');
+                const response = await fetch('/api/settings');
+                if (!response.ok) throw new Error('Network error');
                 const settings = await response.json();
                 currentSettings = settings;
 
                 // Populate text fields
-                document.getElementById('theme').value = settings.theme;
-                document.getElementById('name').value = settings.name;
-                document.getElementById('bio').value = settings.bio;
-                document.getElementById('footer').value = settings.footer;
+                document.getElementById('theme').value = settings.theme || 'elegant';
+                document.getElementById('name').value = settings.name || '';
+                document.getElementById('bio').value = settings.bio || '';
+                document.getElementById('footer').value = settings.footer || '';
 
                 // Populate toggle buttons
                 toggleFields.forEach(field => {
@@ -443,6 +444,33 @@
                 // Do not display current password
             } catch (err) {
                 console.error('Failed to load settings', err);
+                // عرض رسالة خطأ للمستخدم
+                const errorMsg = document.getElementById('errorMessage');
+                errorMsg.querySelector('span').textContent = 'Failed to load settings from server. Using default values.';
+                errorMsg.style.display = 'flex';
+                setTimeout(() => errorMsg.style.display = 'none', 5000);
+
+                // استخدام قيم افتراضية
+                currentSettings = {
+                    theme: 'elegant',
+                    profilePhoto: false,
+                    profilePhotoUrl: '/static/profile.jpg',
+                    name: 'Your Name',
+                    bio: 'Your bio or tagline',
+                    footer: 'All rights reserved VEX© 2026',
+                    adminPanel: false,
+                    adminPage: true,
+                    adminPassword: '',
+                    search: false,
+                    security: false
+                };
+                document.getElementById('theme').value = currentSettings.theme;
+                document.getElementById('name').value = currentSettings.name;
+                document.getElementById('bio').value = currentSettings.bio;
+                document.getElementById('footer').value = currentSettings.footer;
+                toggleFields.forEach(field => {
+                    updateToggleButtons(field, currentSettings[field]);
+                });
             }
         }
 
@@ -562,6 +590,5 @@
         });
     </script>
 </body>
-
 
 </html>
