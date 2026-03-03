@@ -1,38 +1,65 @@
-// index.js - Main server file for LinkGrid
+// index.js - Full version using JSONbin.io for persistent storage
 const express = require('express');
 const path = require('path');
-const fs = require('fs').promises;
 const geoip = require('geoip-lite');
 const useragent = require('express-useragent');
 const multer = require('multer');
 const session = require('express-session');
-const bcrypt = require('bcrypt'); // For password hashing
+const bcrypt = require('bcrypt');
+const fs = require('fs').promises; // still used for file uploads and sessions folder
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 const environment = process.env.NODE_ENV || 'development';
-const saltRounds = 10; // Number of salt rounds for bcrypt
+const saltRounds = 10;
+
+// ==================== JSONbin CONFIGURATION ====================
+const JSONBIN_KEY = process.env.JSONBIN_KEY;
+const SETTINGS_BIN_ID = process.env.SETTINGS_BIN_ID;
+const LINKS_BIN_ID = process.env.LINKS_BIN_ID;
+const STATS_BIN_ID = process.env.STATS_BIN_ID;
+
+// Helper functions for JSONbin
+async function readJSONBin(binId) {
+    const response = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
+        headers: { 'X-Master-Key': JSONBIN_KEY }
+    });
+    if (!response.ok) throw new Error(`JSONbin read error: ${response.status}`);
+    const data = await response.json();
+    return data.record;
+}
+
+async function writeJSONBin(binId, data) {
+    const response = await fetch(`https://api.jsonbin.io/v3/b/${binId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Master-Key': JSONBIN_KEY
+        },
+        body: JSON.stringify(data)
+    });
+    if (!response.ok) throw new Error(`JSONbin write error: ${response.status}`);
+    return response.json();
+}
 
 // ==================== MIDDLEWARE ====================
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use('/static', express.static(path.join(__dirname, 'public')));
-app.use(useragent.express()); // Adds device info to req.useragent
+app.use(useragent.express());
 
-// Trust proxy (Railway, Render, etc.) – important for getting real client IP
 app.set('trust proxy', true);
 
 // ==================== SESSION SETUP ====================
 let sessionStore;
 
-// Use FileStore in production, MemoryStore in development
-if (process.env.NODE_ENV === 'production') {
+if (environment === 'production') {
     const FileStore = require('session-file-store')(session);
     sessionStore = new FileStore({
         path: path.join(__dirname, 'sessions'),
-        ttl: 86400, // 1 day in seconds
+        ttl: 86400,
         retries: 0,
-        reapInterval: 3600 // Clean expired sessions every hour
+        reapInterval: 3600
     });
     console.log('Using FileStore for sessions (production)');
 } else {
@@ -46,14 +73,13 @@ app.use(session({
     store: sessionStore,
     rolling: true,
     cookie: {
-        secure: process.env.NODE_ENV === 'production', // true in production (HTTPS)
+        secure: environment === 'production',
         httpOnly: true,
-        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+        maxAge: 7 * 24 * 60 * 60 * 1000
     }
 }));
 
-// Create sessions folder in production
-if (process.env.NODE_ENV === 'production') {
+if (environment === 'production') {
     const sessionsDir = path.join(__dirname, 'sessions');
     fs.mkdir(sessionsDir, { recursive: true }).catch(() => {});
 }
@@ -64,20 +90,16 @@ fs.mkdir(path.join(__dirname, 'public', 'uploads'), { recursive: true }).catch((
 
 // ==================== HELPER: GET REAL CLIENT IP ====================
 function getClientIp(req) {
-    // Check X-Forwarded-For header (common with proxies)
     const forwarded = req.headers['x-forwarded-for'];
     if (forwarded) {
-        // X-Forwarded-For can be "client, proxy1, proxy2"
         const ips = forwarded.split(',').map(ip => ip.trim());
-        return ips[0]; // first IP is the real client
+        return ips[0];
     }
-    // Fallback to req.ip or remoteAddress
     return req.ip || req.connection.remoteAddress;
 }
 
 // ==================== GEO LOCATION FUNCTION ====================
 async function getCountryFromIP(ip) {
-    // Ignore local / internal IPs
     if (ip === '::1' || ip === '127.0.0.1' || 
         ip.startsWith('10.') || ip.startsWith('192.168.') || 
         ip.startsWith('172.16.') || ip.startsWith('172.17.') ||
@@ -101,39 +123,18 @@ async function getCountryFromIP(ip) {
     }
 }
 
-// ==================== STATISTICS UPDATE FUNCTION ====================
+// ==================== STATISTICS UPDATE FUNCTION (USING JSONBIN) ====================
 async function updateStatistics(linkName, linkUrl, req) {
     try {
-        const statsPath = path.join(__dirname, 'public', 'data', 'statistics.json');
-        let stats = {
-            links: [],
-            totals: {
-                countries: {},
-                devices: {},
-                hourly: new Array(24).fill(0),
-                totalClicks: 0
-            }
-        };
-
-        try {
-            const data = await fs.readFile(statsPath, 'utf8');
-            stats = JSON.parse(data);
-        } catch (err) {
-            // File doesn't exist, use default structure
-        }
-
-        // Get real client IP
+        let stats = await readJSONBin(STATS_BIN_ID);
         const ip = getClientIp(req);
-        console.log('Client IP for analytics:', ip); // For debugging
+        console.log('Client IP for analytics:', ip);
 
         let country = 'Unknown';
-
-        // Try ip-api.com first
         const apiCountry = await getCountryFromIP(ip);
         if (apiCountry) {
             country = apiCountry;
         } else {
-            // Fallback to geoip-lite
             const geo = geoip.lookup(ip);
             country = geo ? geo.country : 'Unknown';
         }
@@ -155,20 +156,18 @@ async function updateStatistics(linkName, linkUrl, req) {
             stats.links.push(linkStats);
         }
 
-        // Update link stats
         linkStats.clicks += 1;
         linkStats.lastClicked = new Date().toISOString();
         linkStats.countries[country] = (linkStats.countries[country] || 0) + 1;
         linkStats.devices[device] = (linkStats.devices[device] || 0) + 1;
         linkStats.hourly[hour] = (linkStats.hourly[hour] || 0) + 1;
 
-        // Update totals
         stats.totals.countries[country] = (stats.totals.countries[country] || 0) + 1;
         stats.totals.devices[device] = (stats.totals.devices[device] || 0) + 1;
         stats.totals.hourly[hour] = (stats.totals.hourly[hour] || 0) + 1;
         stats.totals.totalClicks = (stats.totals.totalClicks || 0) + 1;
 
-        await fs.writeFile(statsPath, JSON.stringify(stats, null, 2), 'utf8');
+        await writeJSONBin(STATS_BIN_ID, stats);
         return true;
     } catch (error) {
         console.error('Error updating statistics:', error);
@@ -181,27 +180,36 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// API: Get links
+// API: Get settings (from JSONbin)
+app.get('/api/settings', async (req, res) => {
+    try {
+        const settings = await readJSONBin(SETTINGS_BIN_ID);
+        res.json(settings);
+    } catch (error) {
+        console.error('Error reading settings:', error);
+        res.status(500).json({ error: 'Failed to read settings' });
+    }
+});
+
+// API: Get links (from JSONbin)
 app.get('/api/links', async (req, res) => {
     try {
-        const linksPath = path.join(__dirname, 'public', 'data', 'links.json');
-        const data = await fs.readFile(linksPath, 'utf8');
-        res.json(JSON.parse(data));
+        const links = await readJSONBin(LINKS_BIN_ID);
+        res.json(links);
     } catch (error) {
         console.error('Error reading links:', error);
         res.status(500).json({ error: 'Failed to read links' });
     }
 });
 
-// API: Save links
+// API: Save links (to JSONbin)
 app.post('/api/links', async (req, res) => {
     try {
-        const linksPath = path.join(__dirname, 'public', 'data', 'links.json');
         const links = req.body;
         if (!Array.isArray(links)) {
             return res.status(400).json({ error: 'Invalid data format' });
         }
-        await fs.writeFile(linksPath, JSON.stringify(links, null, 2), 'utf8');
+        await writeJSONBin(LINKS_BIN_ID, links);
         res.json({ success: true, message: 'Links saved successfully' });
     } catch (error) {
         console.error('Error saving links:', error);
@@ -210,7 +218,6 @@ app.post('/api/links', async (req, res) => {
 });
 
 // ==================== ANALYTICS ====================
-// Record a click
 app.post('/api/click', async (req, res) => {
     try {
         const { name, url } = req.body;
@@ -229,35 +236,21 @@ app.post('/api/click', async (req, res) => {
     }
 });
 
-// API to fetch analytics data
 app.get('/api/analytics', async (req, res) => {
     try {
-        const statsPath = path.join(__dirname, 'public', 'data', 'statistics.json');
-        let stats = { links: [], totals: {} };
-        try {
-            const data = await fs.readFile(statsPath, 'utf8');
-            stats = JSON.parse(data);
-        } catch (err) {
-            // File doesn't exist, return empty structure
-        }
+        const stats = await readJSONBin(STATS_BIN_ID);
         res.json(stats);
     } catch (error) {
         console.error('Error reading analytics:', error);
-        res.status(500).json({ error: 'Failed to read analytics' });
+        res.json({ links: [], totals: {} });
     }
 });
 
-// ==================== RESET ANALYTICS ====================
 app.post('/api/analytics/reset', async (req, res) => {
     try {
-        // Check authentication
         if (!req.session.adminAuthenticated) {
             return res.status(401).json({ error: 'Unauthorized' });
         }
-
-        const statsPath = path.join(__dirname, 'public', 'data', 'statistics.json');
-        
-        // Create fresh empty stats structure
         const freshStats = {
             links: [],
             totals: {
@@ -267,10 +260,7 @@ app.post('/api/analytics/reset', async (req, res) => {
                 totalClicks: 0
             }
         };
-
-        // Write empty stats to file
-        await fs.writeFile(statsPath, JSON.stringify(freshStats, null, 2), 'utf8');
-        
+        await writeJSONBin(STATS_BIN_ID, freshStats);
         res.json({ success: true, message: 'Analytics reset successfully' });
     } catch (error) {
         console.error('Error resetting analytics:', error);
@@ -282,17 +272,13 @@ app.post('/api/analytics/reset', async (req, res) => {
 app.post('/admin/login', express.urlencoded({ extended: true }), async (req, res) => {
     try {
         const { password } = req.body;
-        const settingsPath = path.join(__dirname, 'public', 'data', 'settings.json');
-        const settingsData = await fs.readFile(settingsPath, 'utf8');
-        const settings = JSON.parse(settingsData);
+        const settings = await readJSONBin(SETTINGS_BIN_ID);
 
         let isMatch = false;
         if (settings.adminPassword) {
-            // Check if stored password is bcrypt hash
             if (settings.adminPassword.startsWith('$2b$') || settings.adminPassword.startsWith('$2a$')) {
                 isMatch = await bcrypt.compare(password, settings.adminPassword);
             } else {
-                // Backward compatibility with plain text passwords
                 isMatch = (settings.adminPassword === password);
             }
         }
@@ -334,14 +320,10 @@ app.post('/admin/login', express.urlencoded({ extended: true }), async (req, res
 
 app.get('/admin', async (req, res) => {
     try {
-        const settingsPath = path.join(__dirname, 'public', 'data', 'settings.json');
-        const settingsData = await fs.readFile(settingsPath, 'utf8');
-        const settings = JSON.parse(settingsData);
-
+        const settings = await readJSONBin(SETTINGS_BIN_ID);
         if (!settings.adminPage) {
             return res.status(404).send('Admin page disabled');
         }
-
         if (settings.adminPassword && !req.session.adminAuthenticated) {
             return res.send(`
                 <!DOCTYPE html>
@@ -364,14 +346,12 @@ app.get('/admin', async (req, res) => {
                 </html>
             `);
         }
-
         res.sendFile(path.join(__dirname, 'public', 'admin.html'));
     } catch (error) {
         res.status(500).send('Error loading admin page');
     }
 });
 
-// Logout route
 app.get('/admin/logout', (req, res) => {
     req.session.destroy((err) => {
         if (err) console.error('Error destroying session:', err);
@@ -383,23 +363,14 @@ app.get('/admin/logout', (req, res) => {
 // ==================== SETTINGS PAGE ====================
 app.get('/settings', async (req, res) => {
     try {
-        const settingsPath = path.join(__dirname, 'public', 'data', 'settings.json');
-        const settingsData = await fs.readFile(settingsPath, 'utf8');
-        const settings = JSON.parse(settingsData);
-
-        // If there's a session error parameter, force session destruction and show login
+        const settings = await readJSONBin(SETTINGS_BIN_ID);
         if (req.query.error === 'session') {
-            if (req.session) {
-                req.session.destroy(() => {});
-            }
+            if (req.session) req.session.destroy(() => {});
             return showSettingsLogin(res, 'Your session has expired. Please login again.');
         }
-
-        // Normal authentication check
         if (settings.adminPassword && !req.session.adminAuthenticated) {
             return showSettingsLogin(res);
         }
-
         res.sendFile(path.join(__dirname, 'public', 'settings.html'));
     } catch (error) {
         res.status(500).send('Error loading settings page');
@@ -438,10 +409,7 @@ function showSettingsLogin(res, errorMsg = '') {
 app.post('/settings/login', express.urlencoded({ extended: true }), async (req, res) => {
     try {
         const { password } = req.body;
-        const settingsPath = path.join(__dirname, 'public', 'data', 'settings.json');
-        const settingsData = await fs.readFile(settingsPath, 'utf8');
-        const settings = JSON.parse(settingsData);
-
+        const settings = await readJSONBin(SETTINGS_BIN_ID);
         let isMatch = false;
         if (settings.adminPassword) {
             if (settings.adminPassword.startsWith('$2b$') || settings.adminPassword.startsWith('$2a$')) {
@@ -450,7 +418,6 @@ app.post('/settings/login', express.urlencoded({ extended: true }), async (req, 
                 isMatch = (settings.adminPassword === password);
             }
         }
-
         if (isMatch) {
             req.session.adminAuthenticated = true;
             req.session.save((err) => {
@@ -461,7 +428,6 @@ app.post('/settings/login', express.urlencoded({ extended: true }), async (req, 
             showSettingsLogin(res, 'Invalid password');
         }
     } catch (error) {
-        console.error(error);
         res.status(500).send('Error');
     }
 });
@@ -472,10 +438,7 @@ app.post('/settings', upload.single('profilePhotoFile'), async (req, res) => {
             return res.redirect('/settings?error=session');
         }
 
-        const settingsPath = path.join(__dirname, 'public', 'data', 'settings.json');
-        const settingsData = await fs.readFile(settingsPath, 'utf8');
-        let settings = JSON.parse(settingsData);
-
+        let settings = await readJSONBin(SETTINGS_BIN_ID);
         const { theme, name, bio, footer, adminPanel, adminPage, adminPassword, search, profilePhoto, security } = req.body;
 
         let newAdminPanel = adminPanel === 'on';
@@ -495,17 +458,12 @@ app.post('/settings', upload.single('profilePhotoFile'), async (req, res) => {
         settings.search = newSearch;
         settings.adminPage = adminPage === 'on';
         settings.security = newSecurity;
-        
-        // Handle password: if a new password is provided (non-empty), hash it
         if (adminPassword && adminPassword.trim() !== '') {
             const hashedPassword = await bcrypt.hash(adminPassword, saltRounds);
             settings.adminPassword = hashedPassword;
         }
-        // If empty, keep the current password (no change)
-
         settings.profilePhoto = profilePhoto === 'on';
 
-        // Handle file upload
         if (req.file) {
             const oldPath = req.file.path;
             const ext = path.extname(req.file.originalname);
@@ -515,7 +473,7 @@ app.post('/settings', upload.single('profilePhotoFile'), async (req, res) => {
             settings.profilePhotoUrl = `/static/${newFilename}`;
         }
 
-        await fs.writeFile(settingsPath, JSON.stringify(settings, null, 2), 'utf8');
+        await writeJSONBin(SETTINGS_BIN_ID, settings);
         res.redirect('/settings?success=true');
     } catch (error) {
         console.error(error);
@@ -523,7 +481,6 @@ app.post('/settings', upload.single('profilePhotoFile'), async (req, res) => {
     }
 });
 
-// Optional: dedicated logout for settings
 app.get('/settings/logout', (req, res) => {
     req.session.destroy((err) => {
         if (err) console.error('Error destroying session:', err);
@@ -532,13 +489,9 @@ app.get('/settings/logout', (req, res) => {
     });
 });
 
-// Favicon endpoint (uses settings.json to get custom favicon)
+// Favicon endpoint
 app.get('/docs/favicon', (req, res) => {
-    const f = require('fs');
-    const settings = f.readFileSync(path.join(__dirname, 'public', 'data', 'settings.json'), 'utf8');
-    const parsed = JSON.parse(settings);
-    const favicon = parsed.faviconUrl || '/favicon.ico';
-    res.sendFile(path.join(__dirname, 'public', favicon));
+    res.sendFile(path.join(__dirname, 'public', 'favicon.png'));
 });
 
 // ==================== CATCH-ALL ====================
@@ -547,5 +500,9 @@ app.use((req, res) => {
 });
 
 // ==================== START SERVER ====================
-app.listen(port);
+app.listen(port, () => {
+    console.log(`Server running on port ${port} in ${environment} mode`);
+});
+
+
 
