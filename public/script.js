@@ -102,27 +102,12 @@ function debounce(func, wait) {
     };
 }
 
-// ==================== DATA FETCHING ====================
+// ==================== DATA FETCHING (NOW USING /api/settings) ====================
 async function fetchSettings() {
     try {
-        const response = await fetch('/static/data/settings.json');
+        const response = await fetch('/api/settings');
         if (!response.ok) throw new Error('Network error');
-        const data = await response.json();
-        // Merge with defaults to ensure all properties exist
-        return {
-            theme: data.theme || 'elegant',
-            profilePhoto: data.profilePhoto !== undefined ? data.profilePhoto : false,
-            profilePhotoUrl: data.profilePhotoUrl || '/static/profile.jpg',
-            name: data.name || 'Your Name',
-            bio: data.bio || 'Your bio or tagline',
-            footer: data.footer || 'All rights reserved VEX© 2026',
-            adminPanel: data.adminPanel !== undefined ? data.adminPanel : false,
-            adminPage: data.adminPage !== undefined ? data.adminPage : false,
-            adminPassword: data.adminPassword || '',
-            search: data.search !== undefined ? data.search : true,
-            security: data.security !== undefined ? data.security : false,
-            faviconUrl: data.faviconUrl || '/favicon.ico'
-        };
+        return await response.json();
     } catch (error) {
         console.warn(lang.usingDefaultSettings);
         return {
@@ -133,21 +118,16 @@ async function fetchSettings() {
             bio: 'Your bio or tagline',
             footer: 'All rights reserved VEX© 2026',
             adminPanel: false,
-            adminPage: false,
-            adminPassword: '',
-            search: true,
-            security: false,
-            faviconUrl: '/favicon.ico'
+            search: true
         };
     }
 }
 
 async function fetchLinks() {
     try {
-        const response = await fetch('/static/data/links.json');
+        const response = await fetch('/api/links');
         if (!response.ok) throw new Error('Network error');
         let data = await response.json();
-        // تأكد من وجود clicks لكل رابط
         data = data.map(link => ({
             ...link,
             clicks: link.clicks || 0
@@ -182,7 +162,6 @@ async function saveLinks(newLinks) {
 // ==================== SETTINGS APPLICATION ====================
 function applySettings(settingsData) {
     settings = settingsData;
-    // Use default theme if not present
     document.body.className = `theme-${(settings.theme || 'elegant').toLowerCase()}`;
     if (elements.profileName) elements.profileName.textContent = settings.name || '';
     if (elements.profileBio) elements.profileBio.textContent = settings.bio || '';
@@ -215,27 +194,21 @@ function applySettings(settingsData) {
 // ==================== FILTERING LOGIC ====================
 function filterLinks() {
     const q = searchQuery.toLowerCase();
-
     if (!q) {
         filteredLinks = [...links];
         return filteredLinks;
     }
-
     const result = links.filter(link =>
         link.name.toLowerCase().includes(q) ||
         link.url.toLowerCase().includes(q)
     );
-
     filteredLinks = result;
     return result;
 }
 
-// ==================== UPDATE SEARCH UI ====================
 function updateSearchUI() {
     if (!elements.resultsCount) return;
-
     elements.resultsCount.textContent = `${filteredLinks.length} of ${links.length}`;
-
     if (elements.searchClearBtn) {
         elements.searchClearBtn.style.display = searchQuery ? 'block' : 'none';
     }
@@ -245,7 +218,6 @@ function updateSearchUI() {
 function renderLinks(linksToRender, isAdmin = false) {
     if (!elements.linksContainer) return;
 
-    // تدمير Sortable بشكل كامل قبل إعادة الرسم
     if (sortableInstance) {
         sortableInstance.destroy();
         sortableInstance = null;
@@ -265,15 +237,10 @@ function renderLinks(linksToRender, isAdmin = false) {
         card.rel = 'noopener noreferrer';
         card.className = 'link-card';
         card.style.animationDelay = `${index * 0.1}s`;
-
-        // تخزين نسخة كاملة من البيانات (مهم جداً للـ drag & drop)
         card.linkData = { ...link };
-
-        // إضافة data attribute للمساعدة في التتبع
         card.dataset.linkName = link.name;
         card.dataset.linkUrl = link.url;
 
-        // Determine icon
         const useFavicon = link.icon && link.icon.toLowerCase() === 'auto';
         if (useFavicon) {
             const faviconUrl = getFaviconUrl(link.url);
@@ -293,24 +260,17 @@ function renderLinks(linksToRender, isAdmin = false) {
             card.innerHTML = `<i class="${link.icon}" aria-hidden="true"></i><span>${link.name}</span>`;
         }
 
-        // Add click event for analytics (without preventing default)
         card.addEventListener('click', (e) => {
-            // عدم إرسال analytics في حالة الضغط على زر الحذف
-            if (e.target.classList.contains('delete-btn')) {
-                return;
-            }
-
+            if (e.target.classList.contains('delete-btn')) return;
             fetch('/api/click', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name: link.name, url: link.url }),
                 keepalive: true
             }).catch(err => console.warn('Analytics error:', err));
-
             showToast(`${lang.redirecting} ${link.name}...`, 2000);
         });
 
-        // Add delete button for admin mode
         if (isAdmin) {
             const deleteBtn = document.createElement('span');
             deleteBtn.innerHTML = '&times;';
@@ -333,9 +293,7 @@ function renderLinks(linksToRender, isAdmin = false) {
         elements.linksContainer.appendChild(card);
     });
 
-    // إعادة تهيئة Sortable بعد الرسم الكامل
     if (isAdmin) {
-        // استخدام setTimeout لضمان اكتمال الرسم
         setTimeout(() => {
             initSortable();
         }, 50);
@@ -351,22 +309,16 @@ function filterAndRender(isAdmin = false) {
 // ==================== SEARCH UI ====================
 function initSearch() {
     if (!settings.search) return;
-
-    // Create search container
     const searchContainer = document.createElement('div');
     searchContainer.className = 'search-module';
-
     const searchInput = document.createElement('input');
     searchInput.type = 'text';
     searchInput.className = 'search-input';
     searchInput.placeholder = lang.searchPlaceholder;
-
     const searchIcon = document.createElement('i');
     searchIcon.className = 'fa-solid fa-search search-icon';
-
     const resultsCount = document.createElement('span');
     resultsCount.className = 'results-count';
-
     const clearBtn = document.createElement('button');
     clearBtn.className = 'search-clear';
     clearBtn.innerHTML = '&times;';
@@ -376,11 +328,8 @@ function initSearch() {
     searchContainer.appendChild(searchInput);
     searchContainer.appendChild(resultsCount);
     searchContainer.appendChild(clearBtn);
-
-    // Insert before links container
     elements.linksContainer.parentNode.insertBefore(searchContainer, elements.linksContainer);
 
-    // Search handler with debounce
     const handleSearch = debounce(() => {
         searchQuery = searchInput.value.trim();
         filterAndRender(settings.adminPanel);
@@ -391,7 +340,6 @@ function initSearch() {
         filterAndRender(settings.adminPanel);
     });
 
-    // Clear button handler
     clearBtn.addEventListener('click', () => {
         searchInput.value = '';
         searchQuery = '';
@@ -399,7 +347,6 @@ function initSearch() {
         searchInput.focus();
     });
 
-    // Store references
     elements.searchInput = searchInput;
     elements.resultsCount = resultsCount;
     elements.searchClearBtn = clearBtn;
@@ -408,14 +355,10 @@ function initSearch() {
 // ==================== SORTABLE (DRAG & DROP) ====================
 function initSortable() {
     if (!settings.adminPanel || !elements.linksContainer) return;
-
-    // تدمير النسخة القديمة إذا كانت موجودة
     if (sortableInstance) {
         sortableInstance.destroy();
         sortableInstance = null;
     }
-
-    // التحقق من وجود عناصر قابلة للسحب
     const cards = elements.linksContainer.querySelectorAll('.link-card');
     if (cards.length === 0) return;
 
@@ -426,44 +369,34 @@ function initSortable() {
         dragClass: "dragging",
         ghostClass: "sortable-ghost",
         chosenClass: "sortable-chosen",
-        handle: '.link-card', // تحديد العنصر الذي يمكن سحبه
+        handle: '.link-card',
         onStart: function (evt) {
-            // إضافة class عند بدء السحب
             evt.item.classList.add('is-dragging');
         },
         onEnd: async function (evt) {
             evt.item.classList.remove('is-dragging');
-
-            // الحصول على الترتيب الجديد من DOM
             const cards = elements.linksContainer.querySelectorAll('.link-card');
             const newOrder = [];
-
             cards.forEach(card => {
                 if (card.linkData) {
                     newOrder.push({ ...card.linkData });
                 }
             });
-
-            // التحقق من وجود بيانات صحيحة
             if (newOrder.length === 0) {
                 console.error('No valid link data found');
                 showToast(lang.saveFailed, 3000);
                 filterAndRender(true);
                 return;
             }
-
-            // حفظ الترتيب الجديد
             const result = await saveLinks(newOrder);
             if (result) {
                 links = newOrder;
                 showToast(lang.linksSaved);
-                // إعادة الرسم مع الحفاظ على admin mode
                 setTimeout(() => {
                     filterAndRender(true);
                 }, 100);
             } else {
                 showToast(lang.saveFailed, 3000);
-                // استعادة الترتيب القديم
                 filterAndRender(true);
             }
         }
@@ -473,8 +406,6 @@ function initSortable() {
 // ==================== ADMIN PANEL MODAL ====================
 function setupAdminModal() {
     if (!settings.adminPanel) return;
-
-    // Set localized text
     if (elements.modalTitle) elements.modalTitle.textContent = lang.modalTitle;
     if (elements.labelName) elements.labelName.textContent = lang.labelName;
     if (elements.labelUrl) elements.labelUrl.textContent = lang.labelUrl;
@@ -485,7 +416,6 @@ function setupAdminModal() {
     if (elements.linkUrlInput) elements.linkUrlInput.placeholder = lang.placeholderUrl;
     if (elements.linkIconInput) elements.linkIconInput.placeholder = lang.placeholderIcon;
 
-    // Modal handlers
     elements.addLinkBtn.addEventListener('click', () => {
         elements.modal.style.display = 'block';
         elements.linkNameInput.focus();
@@ -503,27 +433,21 @@ function setupAdminModal() {
         }
     });
 
-    // Form submission
     elements.linkForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-
         const newLink = {
             name: elements.linkNameInput.value.trim(),
             url: elements.linkUrlInput.value.trim(),
             icon: elements.linkIconInput.value.trim() || 'fa-solid fa-globe',
             clicks: 0
         };
-
         const updatedLinks = [...links, newLink];
         const result = await saveLinks(updatedLinks);
         if (result) {
             links = updatedLinks;
-            // إغلاق النموذج أولاً
             elements.modal.style.display = 'none';
             elements.linkForm.reset();
-            // إعادة رسم القائمة
             filterAndRender(true);
-            // إظهار رسالة النجاح
             showToast(lang.linkAdded);
         } else {
             showToast('Failed to add link!', 3000);
@@ -533,12 +457,10 @@ function setupAdminModal() {
 
 // ==================== INITIALIZATION ====================
 async function init() {
-    // Show loading
     if (elements.linksContainer) {
         elements.linksContainer.innerHTML = `<div class="loading">${lang.loading}</div>`;
     }
 
-    // Fetch settings and links
     const [settingsData, linksData] = await Promise.all([
         fetchSettings(),
         fetchLinks()
@@ -546,18 +468,13 @@ async function init() {
 
     settings = settingsData;
     links = linksData;
-    filteredLinks = links; // Initialize filteredLinks
+    filteredLinks = links;
 
     applySettings(settings);
 
-    // إضافة زر Analytics إذا كان admin panel مفعل
     if (settings.adminPanel && settings.adminPage) {
         const adminBtnContainer = document.getElementById('admin-button-container');
         if (adminBtnContainer) {
-            // تأكد من وجود الزر الأصلي (Add New Link)
-            const addBtn = document.getElementById('add-link-btn');
-
-            // أضف زر Analytics
             const analyticsBtn = document.createElement('button');
             analyticsBtn.className = 'add-btn';
             analyticsBtn.innerHTML = '<i class="fa-solid fa-chart-simple"></i> <span>Analytics</span>';
@@ -565,7 +482,6 @@ async function init() {
             analyticsBtn.addEventListener('click', () => {
                 window.location.href = '/admin';
             });
-
             adminBtnContainer.appendChild(analyticsBtn);
         }
     }
@@ -580,20 +496,16 @@ async function init() {
         }
     }
 
-    // Initialize search if enabled
     if (settings.search) {
         initSearch();
     }
 
-    // Render links
     filterAndRender(settings.adminPanel);
 
-    // Setup admin modal if enabled
     if (settings.adminPanel) setupAdminModal();
 
     setTimeout(() => showToast(lang.welcomeToast, 3000), 500);
 
-    // Avatar click interaction (if avatar exists)
     setTimeout(() => {
         const avatar = document.querySelector('.profile-avatar img');
         if (avatar) {
