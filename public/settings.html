@@ -1,16 +1,19 @@
-<!-- public/settings.html (مع الحصول على الإعدادات من JSONbin عبر API) -->
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings - LinkGrid</title>
+    <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <!-- Google Fonts Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Main stylesheet (includes themes) -->
     <link rel="stylesheet" href="/static/style.css">
+    <!-- Favicon endpoint -->
     <link rel="icon" href="/docs/favicon">
     <style>
+        /* Custom styles for settings page – dark modern theme */
         :root {
             --bg: #0e1015;
             --card: #171a21;
@@ -23,14 +26,13 @@
             --danger: #ff4d6d;
         }
 
-        /* Base */
         body {
             background: radial-gradient(circle at top, #141824, #0e1015 60%);
             font-family: 'Inter', sans-serif;
             color: var(--text);
         }
 
-        /* Header */
+        /* Header with title and logout */
         .settings-header {
             display: flex;
             justify-content: space-between;
@@ -52,7 +54,7 @@
             top: 0;
         }
 
-        /* Container */
+        /* Main settings container */
         .settings-container {
             max-width: 900px;
             margin: auto;
@@ -63,14 +65,14 @@
             box-shadow: 0 40px 90px rgba(0, 0, 0, .6);
         }
 
-        /* Grid */
+        /* Grid layout for settings cards */
         .settings-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
             gap: 1.5rem;
         }
 
-        /* Card */
+        /* Individual setting card */
         .setting-item {
             background: var(--card-2);
             padding: 1.8rem;
@@ -84,14 +86,13 @@
             transform: translateY(-4px);
         }
 
-        /* Labels */
         .setting-label {
             font-weight: 600;
             margin-bottom: 1rem;
             color: var(--text-muted);
         }
 
-        /* Inputs */
+        /* Input fields (text, password, textarea, select) */
         .input-field {
             width: 100%;
             padding: .9rem 1.2rem;
@@ -108,7 +109,7 @@
             box-shadow: 0 0 0 4px var(--accent-soft);
         }
 
-        /* Toggle */
+        /* Toggle buttons (On/Off) */
         .toggle-buttons {
             display: flex;
             gap: .8rem;
@@ -139,7 +140,7 @@
             color: white;
         }
 
-        /* Buttons */
+        /* Action buttons (Save / Cancel) */
         .action-buttons {
             margin-top: 3rem;
             display: flex;
@@ -177,7 +178,7 @@
             color: var(--accent);
         }
 
-        /* Messages */
+        /* Success and error message banners */
         .success-message {
             background: var(--accent-soft);
             border: 1px solid var(--accent);
@@ -194,6 +195,7 @@
             margin-bottom: 1.5rem;
         }
 
+        /* Small note under inputs */
         .note {
             margin-top: .6rem;
             font-size: .85rem;
@@ -201,15 +203,11 @@
         }
     </style>
 </head>
-
 <body>
     <div class="container">
         <div class="settings-header">
-            <h1>
-                <i class="fa-solid fa-gear"></i>
-                Settings
-            </h1>
-            <!-- Logout now destroys session and redirects to home -->
+            <h1><i class="fa-solid fa-gear"></i> Settings</h1>
+            <!-- Logout button – destroys session and redirects to home -->
             <a href="/admin/logout" class="btn-secondary" style="padding: 0.8rem 2rem;">
                 <i class="fa-solid fa-sign-out-alt"></i> Logout
             </a>
@@ -218,18 +216,16 @@
         <div class="settings-container">
             <!-- Success message (hidden by default) -->
             <div id="successMessage" style="display: none;" class="success-message">
-                <i class="fa-solid fa-circle-check fa-xl"></i>
-                Settings saved successfully!
+                <i class="fa-solid fa-circle-check fa-xl"></i> Settings saved successfully!
             </div>
 
             <!-- Error message (hidden by default) -->
             <div id="errorMessage" style="display: none;" class="error-message">
-                <i class="fa-solid fa-exclamation-triangle"></i>
-                <span></span>
+                <i class="fa-solid fa-exclamation-triangle"></i> <span></span>
             </div>
 
             <form method="post" action="/settings" enctype="multipart/form-data" id="settingsForm">
-                <!-- Top quick links -->
+                <!-- Quick navigation back to home -->
                 <div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
                     <a href="/" class="btn-secondary" style="padding: 0.8rem 2rem;">
                         <i class="fa-solid fa-arrow-left"></i> Back to Home
@@ -237,11 +233,10 @@
                 </div>
 
                 <div class="settings-grid">
-                    <!-- Theme -->
+                    <!-- Theme selection -->
                     <div class="setting-item">
                         <div class="setting-label">
-                            <i class="fa-solid fa-palette"></i>
-                            <span>Theme</span>
+                            <i class="fa-solid fa-palette"></i> <span>Theme</span>
                         </div>
                         <select name="theme" id="theme" class="input-field">
                             <option value="elegant">Elegant</option>
@@ -252,19 +247,16 @@
                         </select>
                     </div>
 
-                    <!-- Profile Photo -->
+                    <!-- Profile photo toggle + upload -->
                     <div class="setting-item">
                         <div class="setting-label">
-                            <i class="fa-solid fa-camera"></i>
-                            <span>Profile Photo</span>
+                            <i class="fa-solid fa-camera"></i> <span>Profile Photo</span>
                         </div>
                         <div class="toggle-buttons">
-                            <button type="button" class="toggle-btn" id="profilePhotoOn" data-field="profilePhoto"
-                                data-value="true">
+                            <button type="button" class="toggle-btn" id="profilePhotoOn" data-field="profilePhoto" data-value="true">
                                 <i class="fa-solid fa-check-circle"></i> On
                             </button>
-                            <button type="button" class="toggle-btn" id="profilePhotoOff" data-field="profilePhoto"
-                                data-value="false">
+                            <button type="button" class="toggle-btn" id="profilePhotoOff" data-field="profilePhoto" data-value="false">
                                 <i class="fa-solid fa-times-circle"></i> Off
                             </button>
                         </div>
@@ -276,135 +268,99 @@
                             <div class="file-name" id="file-name"></div>
                         </div>
                         <div class="note">
-                            <i class="fa-solid fa-info-circle"></i>
-                            Leave empty to keep current photo
+                            <i class="fa-solid fa-info-circle"></i> Leave empty to keep current photo
                         </div>
                     </div>
 
-                    <!-- Name -->
+                    <!-- Name field -->
                     <div class="setting-item">
                         <div class="setting-label">
-                            <i class="fa-solid fa-signature"></i>
-                            <span>Name</span>
+                            <i class="fa-solid fa-signature"></i> <span>Name</span>
                         </div>
                         <input type="text" name="name" id="name" class="input-field" required>
                     </div>
 
-                    <!-- Bio -->
+                    <!-- Bio textarea -->
                     <div class="setting-item">
                         <div class="setting-label">
-                            <i class="fa-solid fa-quote-right"></i>
-                            <span>Bio</span>
+                            <i class="fa-solid fa-quote-right"></i> <span>Bio</span>
                         </div>
                         <textarea name="bio" id="bio" class="input-field" required></textarea>
                     </div>
 
-                    <!-- Footer -->
+                    <!-- Footer text field -->
                     <div class="setting-item">
                         <div class="setting-label">
-                            <i class="fa-solid fa-copyright"></i>
-                            <span>Footer</span>
+                            <i class="fa-solid fa-copyright"></i> <span>Footer</span>
                         </div>
                         <input type="text" name="footer" id="footer" class="input-field" required>
                     </div>
 
-                    <!-- Admin Password -->
+                    <!-- Admin password field (optional) -->
                     <div class="setting-item">
                         <div class="setting-label">
-                            <i class="fa-solid fa-lock"></i>
-                            <span>Admin Password</span>
+                            <i class="fa-solid fa-lock"></i> <span>Admin Password</span>
                         </div>
-                        <input type="password" name="adminPassword" id="adminPassword" class="input-field"
-                            placeholder="New password">
+                        <input type="password" name="adminPassword" id="adminPassword" class="input-field" placeholder="New password">
                         <div class="note">
-                            <i class="fa-solid fa-info-circle"></i>
-                            Leave empty to keep current
+                            <i class="fa-solid fa-info-circle"></i> Leave empty to keep current
                         </div>
                     </div>
 
-                    <!-- Admin Panel (on main page) -->
+                    <!-- Analytics page toggle (/admin) -->
                     <div class="setting-item">
                         <div class="setting-label">
-                            <i class="fa-solid fa-pen-to-square"></i>
-                            <span>Admin Panel (main page)</span>
+                            <i class="fa-solid fa-chart-simple"></i> <span>Analytics Page (/admin)</span>
                         </div>
                         <div class="toggle-buttons">
-                            <button type="button" class="toggle-btn" id="adminPanelOn" data-field="adminPanel"
-                                data-value="true">
+                            <button type="button" class="toggle-btn" id="adminPageOn" data-field="adminPage" data-value="true">
                                 <i class="fa-solid fa-check-circle"></i> On
                             </button>
-                            <button type="button" class="toggle-btn" id="adminPanelOff" data-field="adminPanel"
-                                data-value="false">
+                            <button type="button" class="toggle-btn" id="adminPageOff" data-field="adminPage" data-value="false">
                                 <i class="fa-solid fa-times-circle"></i> Off
                             </button>
                         </div>
                     </div>
 
-                    <!-- Analytics Page (/admin) -->
+                    <!-- Search bar toggle -->
                     <div class="setting-item">
                         <div class="setting-label">
-                            <i class="fa-solid fa-chart-simple"></i>
-                            <span>Analytics Page (/admin)</span>
+                            <i class="fa-solid fa-magnifying-glass"></i> <span>Search Bar</span>
                         </div>
                         <div class="toggle-buttons">
-                            <button type="button" class="toggle-btn" id="adminPageOn" data-field="adminPage"
-                                data-value="true">
+                            <button type="button" class="toggle-btn" id="searchOn" data-field="search" data-value="true">
                                 <i class="fa-solid fa-check-circle"></i> On
                             </button>
-                            <button type="button" class="toggle-btn" id="adminPageOff" data-field="adminPage"
-                                data-value="false">
-                                <i class="fa-solid fa-times-circle"></i> Off
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Search -->
-                    <div class="setting-item">
-                        <div class="setting-label">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                            <span>Search Bar</span>
-                        </div>
-                        <div class="toggle-buttons">
-                            <button type="button" class="toggle-btn" id="searchOn" data-field="search"
-                                data-value="true">
-                                <i class="fa-solid fa-check-circle"></i> On
-                            </button>
-                            <button type="button" class="toggle-btn" id="searchOff" data-field="search"
-                                data-value="false">
+                            <button type="button" class="toggle-btn" id="searchOff" data-field="search" data-value="false">
                                 <i class="fa-solid fa-times-circle"></i> Off
                             </button>
                         </div>
                         <div class="note">
-                            <i class="fa-solid fa-exclamation-triangle" style="color: var(--accent);"></i>
-                            Search and Admin Panel cannot be enabled at the same time.
+                            <i class="fa-solid fa-info-circle"></i> Enable live search on main page
                         </div>
                     </div>
 
-                    <!-- Security Option -->
+                    <!-- Security mode toggle (production only) -->
                     <div class="setting-item">
                         <div class="setting-label">
-                            <i class="fa-solid fa-shield-halved"></i>
-                            <span>Security Mode</span>
+                            <i class="fa-solid fa-shield-halved"></i> <span>Security Mode</span>
                         </div>
                         <div class="toggle-buttons">
-                            <button type="button" class="toggle-btn" id="securityOn" data-field="security"
-                                data-value="true">
+                            <button type="button" class="toggle-btn" id="securityOn" data-field="security" data-value="true">
                                 <i class="fa-solid fa-check-circle"></i> On
                             </button>
-                            <button type="button" class="toggle-btn" id="securityOff" data-field="security"
-                                data-value="false">
+                            <button type="button" class="toggle-btn" id="securityOff" data-field="security" data-value="false">
                                 <i class="fa-solid fa-times-circle"></i> Off
                             </button>
                         </div>
                         <div class="note">
-                            <i class="fa-solid fa-exclamation-triangle" style="color: var(--accent);"></i>
+                            <i class="fa-solid fa-exclamation-triangle" style="color:var(--accent);"></i>
                             <strong>Warning:</strong> Do not enable in development environment.
-                            This option enhances security for production (e.g., HTTPS enforcement, secure cookies).
                         </div>
                     </div>
                 </div>
 
-                <!-- Action Buttons -->
+                <!-- Action buttons: Cancel and Save -->
                 <div class="action-buttons">
                     <a href="/" class="btn-secondary">
                         <i class="fa-solid fa-times"></i> Cancel
@@ -418,11 +374,11 @@
     </div>
 
     <script>
-        // Fields that use toggle buttons
-        const toggleFields = ['profilePhoto', 'adminPanel', 'adminPage', 'search', 'security'];
+        // Fields that use toggle buttons (adminPanel removed)
+        const toggleFields = ['profilePhoto', 'adminPage', 'search', 'security'];
         let currentSettings = {};
 
-        // Load current settings from API (JSONbin via backend)
+        // Load current settings from /api/settings (JSONbin via backend)
         async function loadSettings() {
             try {
                 const response = await fetch('/api/settings');
@@ -436,21 +392,19 @@
                 document.getElementById('bio').value = settings.bio || '';
                 document.getElementById('footer').value = settings.footer || '';
 
-                // Populate toggle buttons
+                // Update toggle buttons based on current settings
                 toggleFields.forEach(field => {
                     updateToggleButtons(field, settings[field]);
                 });
 
-                // Do not display current password
             } catch (err) {
                 console.error('Failed to load settings', err);
-                // عرض رسالة خطأ للمستخدم
+                // Show error message and fallback to default values
                 const errorMsg = document.getElementById('errorMessage');
                 errorMsg.querySelector('span').textContent = 'Failed to load settings from server. Using default values.';
                 errorMsg.style.display = 'flex';
                 setTimeout(() => errorMsg.style.display = 'none', 5000);
 
-                // استخدام قيم افتراضية
                 currentSettings = {
                     theme: 'elegant',
                     profilePhoto: false,
@@ -458,7 +412,6 @@
                     name: 'Your Name',
                     bio: 'Your bio or tagline',
                     footer: 'All rights reserved VEX© 2026',
-                    adminPanel: false,
                     adminPage: true,
                     adminPassword: '',
                     search: false,
@@ -474,12 +427,11 @@
             }
         }
 
-        // Update the state of On/Off buttons based on boolean value
+        // Update the visual state of On/Off buttons based on boolean value
         function updateToggleButtons(field, value) {
             const onBtn = document.getElementById(field + 'On');
             const offBtn = document.getElementById(field + 'Off');
             if (!onBtn || !offBtn) return;
-
             if (value === true) {
                 onBtn.classList.add('active');
                 onBtn.classList.remove('inactive');
@@ -491,7 +443,7 @@
             }
         }
 
-        // Set up click listeners for toggle buttons with conflict handling
+        // Set up click listeners for toggle buttons (no conflicts now)
         function setupToggleListeners() {
             toggleFields.forEach(field => {
                 const onBtn = document.getElementById(field + 'On');
@@ -499,26 +451,11 @@
 
                 if (onBtn) {
                     onBtn.addEventListener('click', () => {
-                        // If already active, do nothing
                         if (onBtn.classList.contains('active')) return;
-
-                        // Handle conflicts before enabling
-                        if (field === 'search' && currentSettings.adminPanel === true) {
-                            // We want to enable search; if adminPanel is on, turn it off first
-                            currentSettings.adminPanel = false;
-                            updateToggleButtons('adminPanel', false);
-                        } else if (field === 'adminPanel' && currentSettings.search === true) {
-                            // We want to enable adminPanel; if search is on, turn it off
-                            currentSettings.search = false;
-                            updateToggleButtons('search', false);
-                        }
-
-                        // Enable current field
                         currentSettings[field] = true;
                         updateToggleButtons(field, true);
                     });
                 }
-
                 if (offBtn) {
                     offBtn.addEventListener('click', () => {
                         if (offBtn.classList.contains('inactive')) return;
@@ -529,11 +466,10 @@
             });
         }
 
-        // Before form submission, add hidden inputs for boolean fields
+        // Before form submission, add hidden inputs for toggle fields
         function setupFormSubmit() {
             const form = document.getElementById('settingsForm');
             form.addEventListener('submit', (e) => {
-                // Add hidden inputs for toggle fields
                 toggleFields.forEach(field => {
                     let input = document.querySelector(`input[name="${field}"]`);
                     if (!input) {
@@ -544,18 +480,16 @@
                     }
                     input.value = currentSettings[field] ? 'on' : 'off';
                 });
-
-                // theme, name, bio, footer, adminPassword, profilePhotoFile are sent automatically
             });
         }
 
-        // Display selected file name
-        document.getElementById('profilePhotoFile').addEventListener('change', function (e) {
+        // Display selected file name when a file is chosen
+        document.getElementById('profilePhotoFile').addEventListener('change', function(e) {
             const fileName = e.target.files[0] ? e.target.files[0].name : '';
             document.getElementById('file-name').textContent = fileName;
         });
 
-        // Show success message if present in URL
+        // Show success message if URL contains ?success=true
         if (window.location.search.includes('success=true')) {
             document.getElementById('successMessage').style.display = 'flex';
             setTimeout(() => {
@@ -563,32 +497,29 @@
             }, 5000);
         }
 
-        // Show error message if session expired, with auto-redirect to login
+        // Show session expired message and redirect to login after 3 seconds
         if (window.location.search.includes('error=session')) {
             const errorMsg = document.getElementById('errorMessage');
             errorMsg.querySelector('span').textContent = 'Your session has expired. Redirecting to login...';
             errorMsg.style.display = 'flex';
             setTimeout(() => {
-                window.location.href = '/settings'; // This will show the login page
+                window.location.href = '/settings';
             }, 3000);
         }
 
-        // Show error message if trying to enable security in development
+        // Show security‑dev error message
         if (window.location.search.includes('error=security-dev')) {
             const errorMsg = document.getElementById('errorMessage');
             errorMsg.querySelector('span').textContent = 'Security mode cannot be enabled in development environment.';
             errorMsg.style.display = 'flex';
-            setTimeout(() => {
-                errorMsg.style.display = 'none';
-            }, 5000);
+            setTimeout(() => errorMsg.style.display = 'none', 5000);
         }
 
-        // Initialize
+        // Initialize everything
         loadSettings().then(() => {
             setupToggleListeners();
             setupFormSubmit();
         });
     </script>
 </body>
-
 </html>
