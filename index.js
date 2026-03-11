@@ -1,4 +1,6 @@
-// index.js - Full version using JSONbin.io for persistent storage
+// index.js - Main server file for LinkGrid
+// Uses Express, JSONbin.io for persistent storage, sessions, bcrypt, and geolocation
+
 const express = require('express');
 const path = require('path');
 const geoip = require('geoip-lite');
@@ -6,20 +8,25 @@ const useragent = require('express-useragent');
 const multer = require('multer');
 const session = require('express-session');
 const bcrypt = require('bcrypt');
-const fs = require('fs').promises; // still used for file uploads and sessions folder
+const fs = require('fs').promises; // used for file uploads and sessions folder
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5000;
 const environment = process.env.NODE_ENV || 'development';
-const saltRounds = 10;
+const saltRounds = 10; // for bcrypt hashing
 
 // ==================== JSONbin CONFIGURATION ====================
+// These environment variables must be set in production (or .env)
 const JSONBIN_KEY = process.env.JSONBIN_KEY;
 const SETTINGS_BIN_ID = process.env.SETTINGS_BIN_ID;
 const LINKS_BIN_ID = process.env.LINKS_BIN_ID;
 const STATS_BIN_ID = process.env.STATS_BIN_ID;
 
-// Helper functions for JSONbin
+/**
+ * Helper function to read data from a JSONbin.io bin.
+ * @param {string} binId - The bin identifier
+ * @returns {Promise<Object>} The parsed JSON record
+ */
 async function readJSONBin(binId) {
     const response = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
         headers: { 'X-Master-Key': JSONBIN_KEY }
@@ -29,6 +36,12 @@ async function readJSONBin(binId) {
     return data.record;
 }
 
+/**
+ * Helper function to write data to a JSONbin.io bin.
+ * @param {string} binId - The bin identifier
+ * @param {Object} data - The data to store
+ * @returns {Promise<Object>} The API response
+ */
 async function writeJSONBin(binId, data) {
     const response = await fetch(`https://api.jsonbin.io/v3/b/${binId}`, {
         method: 'PUT',
@@ -46,20 +59,22 @@ async function writeJSONBin(binId, data) {
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use('/static', express.static(path.join(__dirname, 'public')));
-app.use(useragent.express());
+app.use(useragent.express()); // adds device info to req.useragent
 
+// Trust proxy (for platforms like Railway, Replit) – important for getting real client IP
 app.set('trust proxy', true);
 
 // ==================== SESSION SETUP ====================
 let sessionStore;
 
 if (environment === 'production') {
+    // In production, use file-based session store to avoid memory leaks
     const FileStore = require('session-file-store')(session);
     sessionStore = new FileStore({
         path: path.join(__dirname, 'sessions'),
-        ttl: 86400,
+        ttl: 86400, // 1 day in seconds
         retries: 0,
-        reapInterval: 3600
+        reapInterval: 3600 // clean expired sessions every hour
     });
     console.log('Using FileStore for sessions (production)');
 } else {
@@ -71,14 +86,15 @@ app.use(session({
     resave: true,
     saveUninitialized: true,
     store: sessionStore,
-    rolling: true,
+    rolling: true, // refresh session on each request
     cookie: {
-        secure: environment === 'production',
+        secure: environment === 'production', // true only in production (HTTPS)
         httpOnly: true,
-        maxAge: 7 * 24 * 60 * 60 * 1000
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     }
 }));
 
+// Ensure sessions folder exists in production
 if (environment === 'production') {
     const sessionsDir = path.join(__dirname, 'sessions');
     fs.mkdir(sessionsDir, { recursive: true }).catch(() => {});
@@ -89,17 +105,28 @@ const upload = multer({ dest: path.join(__dirname, 'public', 'uploads') });
 fs.mkdir(path.join(__dirname, 'public', 'uploads'), { recursive: true }).catch(() => {});
 
 // ==================== HELPER: GET REAL CLIENT IP ====================
+/**
+ * Extract the real client IP from request, taking into account X-Forwarded-For headers.
+ * @param {Object} req - Express request object
+ * @returns {string} The client IP address
+ */
 function getClientIp(req) {
     const forwarded = req.headers['x-forwarded-for'];
     if (forwarded) {
         const ips = forwarded.split(',').map(ip => ip.trim());
-        return ips[0];
+        return ips[0]; // first IP is the original client
     }
     return req.ip || req.connection.remoteAddress;
 }
 
 // ==================== GEO LOCATION FUNCTION ====================
+/**
+ * Get country code from IP address using ip-api.com (fallback to geoip-lite).
+ * @param {string} ip - The IP address
+ * @returns {Promise<string|null>} Country code (e.g., 'US') or null
+ */
 async function getCountryFromIP(ip) {
+    // Ignore local / internal IPs
     if (ip === '::1' || ip === '127.0.0.1' || 
         ip.startsWith('10.') || ip.startsWith('192.168.') || 
         ip.startsWith('172.16.') || ip.startsWith('172.17.') ||
@@ -124,6 +151,13 @@ async function getCountryFromIP(ip) {
 }
 
 // ==================== STATISTICS UPDATE FUNCTION (USING JSONBIN) ====================
+/**
+ * Update click statistics for a given link.
+ * @param {string} linkName - Name of the clicked link
+ * @param {string} linkUrl - URL of the clicked link
+ * @param {Object} req - Express request object (to get IP, user-agent)
+ * @returns {Promise<boolean>} True if successful
+ */
 async function updateStatistics(linkName, linkUrl, req) {
     try {
         let stats = await readJSONBin(STATS_BIN_ID);
@@ -142,6 +176,7 @@ async function updateStatistics(linkName, linkUrl, req) {
         const device = req.useragent.isMobile ? 'mobile' : (req.useragent.isTablet ? 'tablet' : 'desktop');
         const hour = new Date().getHours();
 
+        // Find or create stats for this link
         let linkStats = stats.links.find(l => l.name === linkName && l.url === linkUrl);
         if (!linkStats) {
             linkStats = {
@@ -156,12 +191,14 @@ async function updateStatistics(linkName, linkUrl, req) {
             stats.links.push(linkStats);
         }
 
+        // Update link stats
         linkStats.clicks += 1;
         linkStats.lastClicked = new Date().toISOString();
         linkStats.countries[country] = (linkStats.countries[country] || 0) + 1;
         linkStats.devices[device] = (linkStats.devices[device] || 0) + 1;
         linkStats.hourly[hour] = (linkStats.hourly[hour] || 0) + 1;
 
+        // Update global totals
         stats.totals.countries[country] = (stats.totals.countries[country] || 0) + 1;
         stats.totals.devices[device] = (stats.totals.devices[device] || 0) + 1;
         stats.totals.hourly[hour] = (stats.totals.hourly[hour] || 0) + 1;
@@ -377,7 +414,11 @@ app.get('/settings', async (req, res) => {
     }
 });
 
-// Helper to display settings login page
+/**
+ * Helper function to display the settings login page.
+ * @param {Object} res - Express response object
+ * @param {string} errorMsg - Optional error message to display
+ */
 function showSettingsLogin(res, errorMsg = '') {
     res.send(`
         <!DOCTYPE html>
@@ -439,25 +480,17 @@ app.post('/settings', upload.single('profilePhotoFile'), async (req, res) => {
         }
 
         let settings = await readJSONBin(SETTINGS_BIN_ID);
-        const { theme, name, bio, footer, adminPanel, adminPage, adminPassword, search, profilePhoto, security } = req.body;
+        const { theme, name, bio, footer, adminPage, adminPassword, search, profilePhoto, security } = req.body;
 
-        let newAdminPanel = adminPanel === 'on';
-        let newSearch = search === 'on';
-        if (newAdminPanel && newSearch) newSearch = false;
-
-        let newSecurity = security === 'on';
-        if (newSecurity && environment === 'development') {
-            return res.redirect('/settings?error=security-dev');
-        }
-
+        // adminPanel has been removed – we force it to false
         settings.theme = theme;
         settings.name = name;
         settings.bio = bio;
         settings.footer = footer;
-        settings.adminPanel = newAdminPanel;
-        settings.search = newSearch;
+        settings.adminPanel = false; // Important: adminPanel is always disabled
         settings.adminPage = adminPage === 'on';
-        settings.security = newSecurity;
+        settings.search = search === 'on';
+        settings.security = security === 'on';
         if (adminPassword && adminPassword.trim() !== '') {
             const hashedPassword = await bcrypt.hash(adminPassword, saltRounds);
             settings.adminPassword = hashedPassword;
@@ -489,20 +522,115 @@ app.get('/settings/logout', (req, res) => {
     });
 });
 
-// Favicon endpoint
+// ==================== LINKS MANAGEMENT PAGE (ADMIN STYLE) ====================
+app.get('/links', async (req, res) => {
+    try {
+        const settings = await readJSONBin(SETTINGS_BIN_ID);
+
+        if (settings.adminPassword && !req.session.adminAuthenticated) {
+            return res.send(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Links Login</title>
+                    <style>
+                        body{font-family:Inter,sans-serif;background:#0f1419;color:#f8fafc;display:flex;justify-content:center;align-items:center;height:100vh;}
+                        .login-box{background:rgba(30,35,48,0.8);padding:2rem;border-radius:28px;backdrop-filter:blur(10px);border:1px solid rgba(95,124,175,0.2);width:350px;}
+                        input{padding:0.8rem;border-radius:30px;border:1px solid rgba(95,124,175,0.2);background:rgba(30,35,48,0.8);color:white;width:100%;margin-bottom:1rem;}
+                        button{background:#5f7caf;color:white;border:none;padding:0.8rem 2rem;border-radius:30px;cursor:pointer;width:100%;}
+                    </style>
+                </head>
+                <body>
+                    <div class="login-box">
+                        <h2>Links Management Login</h2>
+                        <form method="post" action="/links/login">
+                            <input type="password" name="password" placeholder="Enter admin password" required>
+                            <button type="submit">Login</button>
+                        </form>
+                    </div>
+                </body>
+                </html>
+            `);
+        }
+
+        res.sendFile(path.join(__dirname, 'public', 'admin-links.html'));
+    } catch (error) {
+        console.error('Error loading links page:', error);
+        res.status(500).send('Error loading links page');
+    }
+});
+
+app.post('/links/login', express.urlencoded({ extended: true }), async (req, res) => {
+    try {
+        const { password } = req.body;
+        const settings = await readJSONBin(SETTINGS_BIN_ID);
+
+        let isMatch = false;
+        if (settings.adminPassword) {
+            if (settings.adminPassword.startsWith('$2b$') || settings.adminPassword.startsWith('$2a$')) {
+                isMatch = await bcrypt.compare(password, settings.adminPassword);
+            } else {
+                isMatch = (settings.adminPassword === password);
+            }
+        }
+
+        if (isMatch) {
+            req.session.adminAuthenticated = true;
+            req.session.save((err) => {
+                if (err) console.error('Session save error:', err);
+                res.redirect('/links');
+            });
+        } else {
+            res.send(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Links Login</title>
+                    <style>
+                        body{font-family:Inter,sans-serif;background:#0f1419;color:#f8fafc;display:flex;justify-content:center;align-items:center;height:100vh;}
+                        .login-box{background:rgba(30,35,48,0.8);padding:2rem;border-radius:28px;backdrop-filter:blur(10px);border:1px solid rgba(95,124,175,0.2);width:350px;}
+                        input{padding:0.8rem;border-radius:30px;border:1px solid rgba(95,124,175,0.2);background:rgba(30,35,48,0.8);color:white;width:100%;margin-bottom:1rem;}
+                        button{background:#5f7caf;color:white;border:none;padding:0.8rem 2rem;border-radius:30px;cursor:pointer;width:100%;}
+                        .error{color:#ef4444;text-align:center;margin-bottom:1rem;}
+                    </style>
+                </head>
+                <body>
+                    <div class="login-box">
+                        <h2>Links Management Login</h2>
+                        <div class="error">Invalid password</div>
+                        <form method="post" action="/links/login">
+                            <input type="password" name="password" placeholder="Enter admin password" required>
+                            <button type="submit">Login</button>
+                        </form>
+                    </div>
+                </body>
+                </html>
+            `);
+        }
+    } catch (error) {
+        console.error('Error in /links/login:', error);
+        res.status(500).send('Error');
+    }
+});
+
+// ==================== MISC ROUTES ====================
+// Favicon endpoint (serves favicon.png from public folder)
 app.get('/docs/favicon', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'favicon.png'));
 });
 
+// Preparation page (helper for JSONbin setup)
+app.get('/prepare', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'prepare.html'));
+});
+
 // ==================== CATCH-ALL ====================
+// Redirect any unknown routes to home
 app.use((req, res) => {
     res.redirect('/');
 });
 
 // ==================== START SERVER ====================
-app.listen(port, () => {
-    console.log(`Server running on port ${port} in ${environment} mode`);
+app.listen(port, '0.0.0.0', () => {
+    console.log(`Server running on port ${port} in ${environment} mode + prepare page is running`);
 });
-
-
-
