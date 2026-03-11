@@ -27,6 +27,13 @@ const LANG = {
 
 const lang = LANG.en;
 
+// ==================== PAGE MODE ====================
+// PAGE_MODE is set in the HTML:
+//   'default' for index.html (public view)
+//   'links' for links.html (public view, no admin features)
+//   'links-admin' for links.html (admin view, full management)
+const PAGE_MODE = window.PAGE_MODE || 'default';
+
 // ==================== DOM ELEMENTS ====================
 const elements = {
     linksContainer: document.getElementById('links-container'),
@@ -102,7 +109,7 @@ function debounce(func, wait) {
     };
 }
 
-// ==================== DATA FETCHING (NOW USING /api/settings) ====================
+// ==================== DATA FETCHING ====================
 async function fetchSettings() {
     try {
         const response = await fetch('/api/settings');
@@ -128,6 +135,7 @@ async function fetchLinks() {
         const response = await fetch('/api/links');
         if (!response.ok) throw new Error('Network error');
         let data = await response.json();
+        // Ensure each link has a clicks property
         data = data.map(link => ({
             ...link,
             clicks: link.clicks || 0
@@ -167,6 +175,7 @@ function applySettings(settingsData) {
     if (elements.profileBio) elements.profileBio.textContent = settings.bio || '';
     if (elements.footerText) elements.footerText.textContent = settings.footer || '';
 
+    // Profile photo
     if (elements.profileAvatarContainer) {
         elements.profileAvatarContainer.innerHTML = '';
         if (settings.profilePhoto) {
@@ -181,13 +190,14 @@ function applySettings(settingsData) {
         }
     }
 
-    if (elements.adminButtonContainer) {
-        elements.adminButtonContainer.style.display = settings.adminPanel ? 'block' : 'none';
-    }
-
-    const settingsPageButton = document.getElementById('settings-page-button');
-    if (settingsPageButton) {
-        settingsPageButton.style.display = settings.adminPanel ? 'block' : 'none';
+    // Hide admin button container in links modes (public or admin)
+    if (PAGE_MODE === 'links' || PAGE_MODE === 'links-admin') {
+        if (elements.adminButtonContainer) elements.adminButtonContainer.style.display = 'none';
+    } else {
+        // In default mode, show only if adminPanel is enabled (but adminPanel is always false now)
+        if (elements.adminButtonContainer) {
+            elements.adminButtonContainer.style.display = settings.adminPanel ? 'block' : 'none';
+        }
     }
 }
 
@@ -218,6 +228,7 @@ function updateSearchUI() {
 function renderLinks(linksToRender, isAdmin = false) {
     if (!elements.linksContainer) return;
 
+    // Destroy previous sortable instance
     if (sortableInstance) {
         sortableInstance.destroy();
         sortableInstance = null;
@@ -237,10 +248,11 @@ function renderLinks(linksToRender, isAdmin = false) {
         card.rel = 'noopener noreferrer';
         card.className = 'link-card';
         card.style.animationDelay = `${index * 0.1}s`;
-        card.linkData = { ...link };
+        card.linkData = { ...link }; // store for sortable
         card.dataset.linkName = link.name;
         card.dataset.linkUrl = link.url;
 
+        // Determine icon: use favicon if icon is "auto"
         const useFavicon = link.icon && link.icon.toLowerCase() === 'auto';
         if (useFavicon) {
             const faviconUrl = getFaviconUrl(link.url);
@@ -260,17 +272,22 @@ function renderLinks(linksToRender, isAdmin = false) {
             card.innerHTML = `<i class="${link.icon}" aria-hidden="true"></i><span>${link.name}</span>`;
         }
 
+        // Click event: send analytics and show redirect toast
         card.addEventListener('click', (e) => {
+            // Ignore clicks on delete button
             if (e.target.classList.contains('delete-btn')) return;
+
             fetch('/api/click', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name: link.name, url: link.url }),
                 keepalive: true
             }).catch(err => console.warn('Analytics error:', err));
+
             showToast(`${lang.redirecting} ${link.name}...`, 2000);
         });
 
+        // Delete button – only visible in admin mode (links-admin or default+adminPanel)
         if (isAdmin) {
             const deleteBtn = document.createElement('span');
             deleteBtn.innerHTML = '&times;';
@@ -293,6 +310,7 @@ function renderLinks(linksToRender, isAdmin = false) {
         elements.linksContainer.appendChild(card);
     });
 
+    // Initialize sortable only in admin mode
     if (isAdmin) {
         setTimeout(() => {
             initSortable();
@@ -301,24 +319,32 @@ function renderLinks(linksToRender, isAdmin = false) {
 }
 
 function filterAndRender(isAdmin = false) {
+    // Determine final admin status based on page mode
+    const finalAdmin = (PAGE_MODE === 'links-admin') ? true : isAdmin;
     const filtered = filterLinks();
-    renderLinks(filtered, isAdmin);
+    renderLinks(filtered, finalAdmin);
     updateSearchUI();
 }
 
 // ==================== SEARCH UI ====================
 function initSearch() {
     if (!settings.search) return;
+
+    // Create search container dynamically
     const searchContainer = document.createElement('div');
     searchContainer.className = 'search-module';
+
     const searchInput = document.createElement('input');
     searchInput.type = 'text';
     searchInput.className = 'search-input';
     searchInput.placeholder = lang.searchPlaceholder;
+
     const searchIcon = document.createElement('i');
     searchIcon.className = 'fa-solid fa-search search-icon';
+
     const resultsCount = document.createElement('span');
     resultsCount.className = 'results-count';
+
     const clearBtn = document.createElement('button');
     clearBtn.className = 'search-clear';
     clearBtn.innerHTML = '&times;';
@@ -328,25 +354,25 @@ function initSearch() {
     searchContainer.appendChild(searchInput);
     searchContainer.appendChild(resultsCount);
     searchContainer.appendChild(clearBtn);
+
+    // Insert before links container
     elements.linksContainer.parentNode.insertBefore(searchContainer, elements.linksContainer);
 
-    const handleSearch = debounce(() => {
-        searchQuery = searchInput.value.trim();
-        filterAndRender(settings.adminPanel);
-    }, 300);
-
+    // Input event with debounce
     searchInput.addEventListener('input', (e) => {
         searchQuery = e.target.value.trim();
-        filterAndRender(settings.adminPanel);
+        filterAndRender(PAGE_MODE === 'links-admin' ? true : (PAGE_MODE === 'default' && settings.adminPanel));
     });
 
+    // Clear button click
     clearBtn.addEventListener('click', () => {
         searchInput.value = '';
         searchQuery = '';
-        filterAndRender(settings.adminPanel);
+        filterAndRender(PAGE_MODE === 'links-admin' ? true : (PAGE_MODE === 'default' && settings.adminPanel));
         searchInput.focus();
     });
 
+    // Store references
     elements.searchInput = searchInput;
     elements.resultsCount = resultsCount;
     elements.searchClearBtn = clearBtn;
@@ -354,11 +380,15 @@ function initSearch() {
 
 // ==================== SORTABLE (DRAG & DROP) ====================
 function initSortable() {
-    if (!settings.adminPanel || !elements.linksContainer) return;
+    // Only enable in admin mode (links-admin or default+adminPanel)
+    if (PAGE_MODE !== 'links-admin' && (PAGE_MODE !== 'default' || !settings.adminPanel)) return;
+    if (!elements.linksContainer) return;
+
     if (sortableInstance) {
         sortableInstance.destroy();
         sortableInstance = null;
     }
+
     const cards = elements.linksContainer.querySelectorAll('.link-card');
     if (cards.length === 0) return;
 
@@ -375,6 +405,7 @@ function initSortable() {
         },
         onEnd: async function (evt) {
             evt.item.classList.remove('is-dragging');
+
             const cards = elements.linksContainer.querySelectorAll('.link-card');
             const newOrder = [];
             cards.forEach(card => {
@@ -382,12 +413,14 @@ function initSortable() {
                     newOrder.push({ ...card.linkData });
                 }
             });
+
             if (newOrder.length === 0) {
                 console.error('No valid link data found');
                 showToast(lang.saveFailed, 3000);
                 filterAndRender(true);
                 return;
             }
+
             const result = await saveLinks(newOrder);
             if (result) {
                 links = newOrder;
@@ -403,9 +436,12 @@ function initSortable() {
     });
 }
 
-// ==================== ADMIN PANEL MODAL ====================
+// ==================== ADMIN PANEL MODAL (for adding/editing links) ====================
 function setupAdminModal() {
-    if (!settings.adminPanel) return;
+    // Enable in default mode with adminPanel enabled, or in links-admin mode always
+    if (PAGE_MODE !== 'links-admin' && (PAGE_MODE !== 'default' || !settings.adminPanel)) return;
+
+    // Set localized text for modal elements
     if (elements.modalTitle) elements.modalTitle.textContent = lang.modalTitle;
     if (elements.labelName) elements.labelName.textContent = lang.labelName;
     if (elements.labelUrl) elements.labelUrl.textContent = lang.labelUrl;
@@ -416,15 +452,20 @@ function setupAdminModal() {
     if (elements.linkUrlInput) elements.linkUrlInput.placeholder = lang.placeholderUrl;
     if (elements.linkIconInput) elements.linkIconInput.placeholder = lang.placeholderIcon;
 
-    elements.addLinkBtn.addEventListener('click', () => {
-        elements.modal.style.display = 'block';
-        elements.linkNameInput.focus();
-    });
+    // Modal open/close handlers
+    if (elements.addLinkBtn) {
+        elements.addLinkBtn.addEventListener('click', () => {
+            elements.modal.style.display = 'block';
+            elements.linkNameInput.focus();
+        });
+    }
 
-    elements.closeModal.addEventListener('click', () => {
-        elements.modal.style.display = 'none';
-        elements.linkForm.reset();
-    });
+    if (elements.closeModal) {
+        elements.closeModal.addEventListener('click', () => {
+            elements.modal.style.display = 'none';
+            elements.linkForm.reset();
+        });
+    }
 
     window.addEventListener('click', (e) => {
         if (e.target === elements.modal) {
@@ -433,34 +474,41 @@ function setupAdminModal() {
         }
     });
 
-    elements.linkForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const newLink = {
-            name: elements.linkNameInput.value.trim(),
-            url: elements.linkUrlInput.value.trim(),
-            icon: elements.linkIconInput.value.trim() || 'fa-solid fa-globe',
-            clicks: 0
-        };
-        const updatedLinks = [...links, newLink];
-        const result = await saveLinks(updatedLinks);
-        if (result) {
-            links = updatedLinks;
-            elements.modal.style.display = 'none';
-            elements.linkForm.reset();
-            filterAndRender(true);
-            showToast(lang.linkAdded);
-        } else {
-            showToast('Failed to add link!', 3000);
-        }
-    });
+    // Form submission: add new link
+    if (elements.linkForm) {
+        elements.linkForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const newLink = {
+                name: elements.linkNameInput.value.trim(),
+                url: elements.linkUrlInput.value.trim(),
+                icon: elements.linkIconInput.value.trim() || 'fa-solid fa-globe',
+                clicks: 0
+            };
+
+            const updatedLinks = [...links, newLink];
+            const result = await saveLinks(updatedLinks);
+            if (result) {
+                links = updatedLinks;
+                elements.modal.style.display = 'none';
+                elements.linkForm.reset();
+                filterAndRender(true);
+                showToast(lang.linkAdded);
+            } else {
+                showToast('Failed to add link!', 3000);
+            }
+        });
+    }
 }
 
 // ==================== INITIALIZATION ====================
 async function init() {
+    // Show loading indicator
     if (elements.linksContainer) {
         elements.linksContainer.innerHTML = `<div class="loading">${lang.loading}</div>`;
     }
 
+    // Fetch settings and links in parallel
     const [settingsData, linksData] = await Promise.all([
         fetchSettings(),
         fetchLinks()
@@ -472,7 +520,8 @@ async function init() {
 
     applySettings(settings);
 
-    if (settings.adminPanel && settings.adminPage) {
+    // Add analytics button if adminPanel and adminPage are enabled (only in default mode)
+    if (PAGE_MODE === 'default' && settings.adminPanel && settings.adminPage) {
         const adminBtnContainer = document.getElementById('admin-button-container');
         if (adminBtnContainer) {
             const analyticsBtn = document.createElement('button');
@@ -486,7 +535,8 @@ async function init() {
         }
     }
 
-    if (settings.adminPanel) {
+    // Add settings button if adminPanel is enabled (only in default mode)
+    if (PAGE_MODE === 'default' && settings.adminPanel) {
         const settingsBtn = document.getElementById('settings-btn');
         if (settingsBtn) {
             settingsBtn.innerHTML = '<i class="fa-solid fa-gear"></i> <span>Settings</span>';
@@ -496,16 +546,21 @@ async function init() {
         }
     }
 
+    // Initialize search if enabled (in any mode except maybe we want search in admin view)
     if (settings.search) {
         initSearch();
     }
 
-    filterAndRender(settings.adminPanel);
+    // Render links (admin mode determined by page mode)
+    filterAndRender(false); // isAdmin param will be overridden inside filterAndRender
 
-    if (settings.adminPanel) setupAdminModal();
+    // Setup admin modal if applicable
+    setupAdminModal();
 
+    // Welcome toast after a short delay
     setTimeout(() => showToast(lang.welcomeToast, 3000), 500);
 
+    // Avatar click interaction (if avatar exists)
     setTimeout(() => {
         const avatar = document.querySelector('.profile-avatar img');
         if (avatar) {
@@ -516,6 +571,7 @@ async function init() {
     }, 100);
 }
 
+// Start when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
 } else {
