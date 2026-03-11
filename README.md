@@ -26,6 +26,7 @@
 - [Screenshots](#-screenshots)
 - [Quick Start](#-quick-start)
 - [Initial Setup](#️-initial-setup)
+- [Managing Links](#️-managing-links-admin-interface)
 - [Cloud Storage (Optional)](#️-cloud-storage-optional)
 - [Analytics Dashboard](#-analytics-dashboard)
 - [Security](#-security)
@@ -72,7 +73,7 @@ LinkGrid is a **fully self-hosted, production-ready** alternative to commercial 
 | ⚙️ **Web-Based Settings** | Configure everything from `/settings` page — no code needed |
 | 📊 **Built-in Analytics** | Track clicks, countries, devices, and hourly activity from `/admin` |
 | 🔍 **Live Search** | Instant filtering with result count |
-| 🖱️ **Drag & Drop Links** | Reorder your links easily from the admin panel |
+| 🖱️ **Dedicated Links Manager** | Separate protected page (`/links`) for full CRUD and drag & drop |
 | 🖼️ **Automatic Favicons** | Icons are fetched automatically from websites |
 | 🔐 **Secure Authentication** | Passwords hashed with bcrypt, session-based login |
 | ☁️ **Cloud Storage Ready** | Use JSONbin.io for persistent data on ephemeral platforms |
@@ -124,9 +125,11 @@ LinkGrid is a **fully self-hosted, production-ready** alternative to commercial 
 
 ### 🖥️ Admin Interface
 
-| Settings Page | Admin Analytics | Admin Panel | Live Search |
-|---------------|-----------------|-------------|-------------|
-| ![Settings](./screenshots/settings.png) | ![Analytics](./screenshots/admin-analytics.png) | ![Admin Panel](./screenshots/admin.png) | ![Search](./screenshots/search.png) |
+| Settings Page | Analytics Dashboard | Links Manager | Live Search |
+|---------------|---------------------|---------------|-------------|
+| ![Settings](./screenshots/settings.png) | ![Analytics](./screenshots/admin-analytics.png) | ![Admin Links](./screenshots/admin-links.png) | ![Search](./screenshots/search.png) |
+
+> **Note:** The new dedicated `/links` page provides a clean, protected interface for managing your links, separate from the public view.
 
 ---
 
@@ -158,7 +161,7 @@ npm start
 
 ### 🔐 First Login
 
-1. Navigate to **`http://localhost:3125/admin`**
+1. Navigate to **`http://localhost:3125/admin`** (or any protected page)
 2. Login with the default password: **`admin`**
 3. **⚠️ CRITICAL:** Change your password immediately from the settings page!
 
@@ -175,14 +178,24 @@ Visit **`http://localhost:3125/settings`** to customize:
 
 **Everything is managed from the web interface — no coding required!**
 
-### 🔗 Managing Your Links
+---
 
-From the main page (if admin panel is enabled), you can:
+## 🖱️ Managing Links (Admin Interface)
 
-- ➕ **Add new links**
-- ✏️ **Edit existing links**
-- 🗑️ **Delete links**
-- 🖱️ **Drag & drop to reorder**
+LinkGrid now features a **dedicated, protected page** for link management: `/links`.
+
+### Accessing the Links Manager
+
+1. Go to **`http://your-site.com/links`**
+2. Log in with your admin password (shared across `/admin`, `/settings`, `/links`)
+
+### Features of `/links` Page
+
+- ✅ **Full CRUD** — Create, read, update, delete links
+- ✅ **Drag & Drop** — Reorder links instantly with visual feedback
+- ✅ **Automatic Favicons** — See icons as you type "auto"
+- ✅ **Admin-style UI** — Dark theme consistent with `/admin` and `/settings`
+- ✅ **Separate from public view** — No risk of accidental edits while visitors browse
 
 ---
 
@@ -272,7 +285,7 @@ If you forget your password, you can:
 
 - ✅ Use a strong, unique password
 - ✅ Enable HTTPS in production
-- ✅ Don't share your admin link publicly
+- ✅ Don't share your admin links publicly
 - ✅ Regularly backup your data
 - ✅ Set `SESSION_SECRET` to a long random string
 
@@ -285,9 +298,10 @@ linkgrid/
 ├── index.js                # Express server (backend)
 ├── package.json            # Node.js dependencies
 ├── public/
-│   ├── index.html          # Main page
+│   ├── index.html          # Main public page
 │   ├── admin.html          # Analytics dashboard
 │   ├── settings.html       # Settings page
+│   ├── admin-links.html    # Dedicated links manager page
 │   ├── prepare.html        # Prep page for JSONbin setup
 │   ├── style.css           # All themes & styles
 │   ├── script.js           # Frontend logic
@@ -363,7 +377,7 @@ pm2 startup
   2. Frontend sends `POST /api/click`
   3. Server extracts IP, geolocation (via ip-api.com + geoip-lite), device type
   4. Server updates statistics (local file or JSONbin)
-- **Admin Authentication:** Session-based using `express-session` with bcrypt password hashing.
+- **Admin Authentication:** Session-based using `express-session` with bcrypt password hashing
 
 #### Environment Variables:
 
@@ -431,6 +445,7 @@ LinkGrid is designed for **speed and efficiency**:
 - [x] Automatic favicons
 - [x] bcrypt password hashing
 - [x] JSONbin.io cloud storage integration
+- [x] Dedicated links manager page (`/links`) with admin UI
 
 ### 🚧 Planned Features
 
@@ -478,6 +493,8 @@ LinkGrid is designed for **speed and efficiency**:
 6. **Environment Variables:** Never commit `.env` file to Git. Use your hosting platform's secret management.
 
 7. **Use Our Prep Page:** For quick JSONbin setup, visit [https://links--vex-sl.replit.app/prepare](https://links--vex-sl.replit.app/prepare) — it contains all the code you need to copy.
+
+8. **No More AdminPanel on Main Page:** The `adminPanel` option has been completely removed. All link management now happens in the dedicated `/links` page, making the public view cleaner and safer.
 
 ---
 
