@@ -11,7 +11,7 @@ const bcrypt = require('bcrypt');
 const fs = require('fs').promises; // used for file uploads and sessions folder
 
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 3000;
 const environment = process.env.NODE_ENV || 'development';
 const saltRounds = 10; // for bcrypt hashing
 
@@ -634,3 +634,4 @@ app.use((req, res) => {
 app.listen(port, '0.0.0.0', () => {
     console.log(`Server running on port ${port} in ${environment} mode + prepare page is running`);
 });
+
