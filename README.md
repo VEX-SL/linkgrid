@@ -153,7 +153,7 @@ npm install
 npm start
 ```
 
-**Access your site:** Open [http://localhost:3125](http://localhost:3125)
+**Access your site:** Open [http://localhost:3000](http://localhost:3000)
 
 ---
 
@@ -161,13 +161,13 @@ npm start
 
 ### 🔐 First Login
 
-1. Navigate to **`http://localhost:3125/admin`** (or any protected page)
+1. Navigate to **`http://localhost:3000/admin`** (or any protected page)
 2. Login with the default password: **`admin`**
 3. **⚠️ CRITICAL:** Change your password immediately from the settings page!
 
 ### 🎨 Configure Your Profile
 
-Visit **`http://localhost:3125/settings`** to customize:
+Visit **`http://localhost:3000/settings`** to customize:
 
 - **Theme** — Choose from 5 beautiful themes
 - **Profile Photo** — Upload your picture
